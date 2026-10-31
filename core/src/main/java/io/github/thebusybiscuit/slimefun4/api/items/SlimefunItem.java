@@ -42,12 +42,16 @@ public class SlimefunItem {
     }
 
     @Nullable
-    private static SlimefunItem wrap(@Nullable io.github.thebusybiscuit.slimefun5.api.items.SlimefunItem item) {
+    public static SlimefunItem wrap(@Nullable io.github.thebusybiscuit.slimefun5.api.items.SlimefunItem item) {
         return item == null ? null : new SlimefunItem(item);
     }
 
     public String getId() {
         return delegate.getId();
+    }
+
+    public String getItemName() {
+        return delegate.getItemName();
     }
 
     public ItemStack getItem() {
@@ -56,5 +60,9 @@ public class SlimefunItem {
 
     public boolean isItem(@Nullable ItemStack item) {
         return delegate.isItem(item);
+    }
+
+    public io.github.thebusybiscuit.slimefun5.api.items.SlimefunItem getDelegate() {
+        return delegate;
     }
 }

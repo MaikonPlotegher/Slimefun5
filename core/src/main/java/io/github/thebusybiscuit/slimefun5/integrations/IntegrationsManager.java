@@ -98,6 +98,9 @@ public class IntegrationsManager {
         try {
             // Load Protection plugin integrations
             protectionManager = new ProtectionManager(plugin);
+
+            // GriefDefender's own Slimefun hook targets the slimefun4 package, so it cannot protect this fork
+            protectionManager.registerModule(plugin.getServer().getPluginManager(), "GriefDefender", GriefDefenderProtectionModule::new);
         } catch (Exception | LinkageError x) {
             Slimefun.logger().log(Level.WARNING, x, () -> "Failed to load Protection plugin integrations for Slimefun v" + Slimefun.getVersion());
         }

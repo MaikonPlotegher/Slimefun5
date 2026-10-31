@@ -1,3 +1,13 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.ow2.asm:asm:9.7")
+        classpath("org.ow2.asm:asm-commons:9.7")
+    }
+}
+
 import java.util.concurrent.TimeUnit
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -10,6 +20,11 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
+import org.objectweb.asm.ClassReader
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.MethodVisitor
+import org.objectweb.asm.Opcodes
 plugins {
     java
     id("com.gradleup.shadow")
@@ -48,6 +63,7 @@ java {
         languageVersion.set(JavaLanguageVersion.of(8))
     }
 }
+
 
 tasks.withType<Javadoc>().configureEach {
     isFailOnError = false
@@ -163,6 +179,96 @@ tasks {
             "**/integrations/WorldEditIntegration.java",
             "**/integrations/PlaceholderAPIIntegration.java"
         )
+
+        doLast {
+            val blockStorageClass = File(destinationDirectory.get().asFile, "me/mrCookieSlime/Slimefun/api/BlockStorage.class")
+            if (blockStorageClass.exists()) {
+                val cr = ClassReader(blockStorageClass.readBytes())
+                val cw = ClassWriter(cr, 0)
+                var hasLegacyBlockCheck = false
+                var hasLegacyLocCheck = false
+
+                val cv = object : ClassVisitor(Opcodes.ASM9, cw) {
+                    override fun visitMethod(
+                        access: Int,
+                        name: String,
+                        descriptor: String,
+                        signature: String?,
+                        exceptions: Array<out String>?
+                    ): MethodVisitor? {
+                        if (name == "check" && descriptor == "(Lorg/bukkit/block/Block;)Lio/github/thebusybiscuit/slimefun4/api/items/SlimefunItem;") {
+                            hasLegacyBlockCheck = true
+                        }
+                        if (name == "check" && descriptor == "(Lorg/bukkit/Location;)Lio/github/thebusybiscuit/slimefun4/api/items/SlimefunItem;") {
+                            hasLegacyLocCheck = true
+                        }
+                        return super.visitMethod(access, name, descriptor, signature, exceptions)
+                    }
+                }
+                cr.accept(cv, 0)
+
+                if (!hasLegacyBlockCheck) {
+                    val mv = cw.visitMethod(
+                        Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC,
+                        "check",
+                        "(Lorg/bukkit/block/Block;)Lio/github/thebusybiscuit/slimefun4/api/items/SlimefunItem;",
+                        null,
+                        null
+                    )
+                    mv.visitCode()
+                    mv.visitVarInsn(Opcodes.ALOAD, 0)
+                    mv.visitMethodInsn(
+                        Opcodes.INVOKESTATIC,
+                        "me/mrCookieSlime/Slimefun/api/BlockStorage",
+                        "check",
+                        "(Lorg/bukkit/block/Block;)Lio/github/thebusybiscuit/slimefun5/api/items/SlimefunItem;",
+                        false
+                    )
+                    mv.visitMethodInsn(
+                        Opcodes.INVOKESTATIC,
+                        "io/github/thebusybiscuit/slimefun4/api/items/SlimefunItem",
+                        "wrap",
+                        "(Lio/github/thebusybiscuit/slimefun5/api/items/SlimefunItem;)Lio/github/thebusybiscuit/slimefun4/api/items/SlimefunItem;",
+                        false
+                    )
+                    mv.visitInsn(Opcodes.ARETURN)
+                    mv.visitMaxs(1, 1)
+                    mv.visitEnd()
+                }
+
+                if (!hasLegacyLocCheck) {
+                    val mv = cw.visitMethod(
+                        Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC,
+                        "check",
+                        "(Lorg/bukkit/Location;)Lio/github/thebusybiscuit/slimefun4/api/items/SlimefunItem;",
+                        null,
+                        null
+                    )
+                    mv.visitCode()
+                    mv.visitVarInsn(Opcodes.ALOAD, 0)
+                    mv.visitMethodInsn(
+                        Opcodes.INVOKESTATIC,
+                        "me/mrCookieSlime/Slimefun/api/BlockStorage",
+                        "check",
+                        "(Lorg/bukkit/Location;)Lio/github/thebusybiscuit/slimefun5/api/items/SlimefunItem;",
+                        false
+                    )
+                    mv.visitMethodInsn(
+                        Opcodes.INVOKESTATIC,
+                        "io/github/thebusybiscuit/slimefun4/api/items/SlimefunItem",
+                        "wrap",
+                        "(Lio/github/thebusybiscuit/slimefun5/api/items/SlimefunItem;)Lio/github/thebusybiscuit/slimefun4/api/items/SlimefunItem;",
+                        false
+                    )
+                    mv.visitInsn(Opcodes.ARETURN)
+                    mv.visitMaxs(1, 1)
+                    mv.visitEnd()
+                }
+
+                blockStorageClass.writeBytes(cw.toByteArray())
+                println("ASM: Injected legacy slimefun4 BlockStorage.check bridge methods into ${blockStorageClass.name}")
+            }
+        }
     }
 
     // Tests run on their own Java-25 toolchain (MockBukkit needs it); the main jar stays Java-8 bytecode,
