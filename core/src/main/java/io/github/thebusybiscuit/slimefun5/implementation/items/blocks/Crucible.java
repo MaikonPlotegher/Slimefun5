@@ -101,16 +101,14 @@ public class Crucible extends SimpleSlimefunItem<BlockUseHandler> implements Rec
         items.add(MaterialCompat.stack(XMaterial.BASALT, 12));
         items.add(new ItemStack(Material.LAVA_BUCKET));
 
-        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {
-            items.add(MaterialCompat.stack(XMaterial.COBBLED_DEEPSLATE, 12));
-            items.add(new ItemStack(Material.LAVA_BUCKET));
+        items.add(MaterialCompat.stack(XMaterial.COBBLED_DEEPSLATE, 12));
+        items.add(new ItemStack(Material.LAVA_BUCKET));
 
-            items.add(MaterialCompat.stack(XMaterial.DEEPSLATE, 10));
-            items.add(new ItemStack(Material.LAVA_BUCKET));
+        items.add(MaterialCompat.stack(XMaterial.DEEPSLATE, 10));
+        items.add(new ItemStack(Material.LAVA_BUCKET));
 
-            items.add(MaterialCompat.stack(XMaterial.TUFF, 8));
-            items.add(new ItemStack(Material.LAVA_BUCKET));
-        }
+        items.add(MaterialCompat.stack(XMaterial.TUFF, 8));
+        items.add(new ItemStack(Material.LAVA_BUCKET));
 
         return items;
     }

@@ -91,18 +91,25 @@ public final class ItemCanonicalizer {
             return false;
         }
 
-        // 9. Check if it actually needs normalization:
-        // Canonical state has displayName == id and lore == null (or empty).
-        boolean hasNonIdName = meta.hasDisplayName() && !id.equals(meta.getDisplayName());
-        boolean hasLore = meta.hasLore() && !meta.getLore().isEmpty();
-
-        if (!hasNonIdName && !hasLore) {
-            return false; // Already canonical!
+        // 9. Check if it matches the current template:
+        ItemMeta templateMeta = sfItem.getItem().getItemMeta();
+        if (templateMeta == null) {
+            return false;
         }
 
-        // Apply canonicalization
-        meta.setDisplayName(id);
-        meta.setLore(null);
+        String targetName = templateMeta.hasDisplayName() ? templateMeta.getDisplayName() : null;
+        java.util.List<String> targetLore = templateMeta.hasLore() ? templateMeta.getLore() : null;
+
+        boolean nameMatches = java.util.Objects.equals(meta.getDisplayName(), targetName);
+        boolean loreMatches = java.util.Objects.equals(meta.getLore(), targetLore);
+
+        if (nameMatches && loreMatches) {
+            return false; // Already matches template!
+        }
+
+        // Apply updated name and lore from template
+        meta.setDisplayName(targetName);
+        meta.setLore(targetLore);
         if (Slimefun.getRegistry() != null && Slimefun.getRegistry().getShownOriginalKey() != null) {
             PdcCompat.remove(meta, Slimefun.getRegistry().getShownOriginalKey());
         }

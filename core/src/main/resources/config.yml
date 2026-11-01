@@ -41,7 +41,7 @@ options:
   # Server default language for item names/lore and messages. A player who hasn't picked their own
   # language (see the 'translation' section) sees this one. Unrecognised codes fall back to 'en' with a
   # console warning. Values: a language code such as en, de, fr, es, it, ru, pl, nl, pt-BR, zh-CN, ja, id, ...
-  language: en
+  language: pt-BR
   # Allow per-player translated item names/lore and messages at all. When false, everyone sees the server
   # default language above. Values: true | false
   enable-translations: true
@@ -246,7 +246,7 @@ metrics:
 translation:
   # Rewrite item name/lore per viewer via packets so each player sees their own language.
   # Values: true | false
-  packets: true
+  packets: false
   # What a missing translation label falls back to: 'english' or 'id' (the raw Slimefun id).
   # Values: english | id
   fallback: english

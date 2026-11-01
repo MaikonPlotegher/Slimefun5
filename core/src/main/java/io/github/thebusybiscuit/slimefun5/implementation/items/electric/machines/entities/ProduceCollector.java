@@ -67,9 +67,7 @@ public class ProduceCollector extends AContainer implements RecipeDisplayItem {
     protected void registerDefaultRecipes() {
         // Milk from adult cows and goats
         addProduce(new AnimalProduce(new ItemStack(Material.BUCKET), new ItemStack(Material.MILK_BUCKET), n -> {
-            MinecraftVersion version = Slimefun.getMinecraftVersion();
-
-            if (n instanceof Cow || (version.isAtLeast(MinecraftVersion.MINECRAFT_1_17) && n instanceof Goat)) {
+            if (n instanceof Cow || n instanceof Goat) {
                 return ((Ageable) n).isAdult();
             } else {
                 return false;
@@ -122,10 +120,8 @@ public class ProduceCollector extends AContainer implements RecipeDisplayItem {
         displayRecipes.add(CustomItemStack.create(Material.BUCKET, null, "&fRequires &bCow &fnearby"));
         displayRecipes.add(new ItemStack(Material.MILK_BUCKET));
 
-        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {
-            displayRecipes.add(CustomItemStack.create(Material.BUCKET, null, "&fRequires &bGoat &fnearby"));
-            displayRecipes.add(new ItemStack(Material.MILK_BUCKET));
-        }
+        displayRecipes.add(CustomItemStack.create(Material.BUCKET, null, "&fRequires &bGoat &fnearby"));
+        displayRecipes.add(new ItemStack(Material.MILK_BUCKET));
 
         displayRecipes.add(CustomItemStack.create(Material.BOWL, null, "&fRequires &bMooshroom &fnearby"));
         displayRecipes.add(MaterialCompat.stack(XMaterial.MUSHROOM_STEW));

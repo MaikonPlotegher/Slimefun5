@@ -23,58 +23,11 @@ public final class MaterialCompat {
      */
     private static final Material FALLBACK = Material.PAPER;
 
-    /**
-     * Sensible legacy substitutes for materials that don't exist on older servers, so an icon resolves
-     * to something recognisable (e.g. NETHERITE_BLOCK -> DIAMOND_BLOCK on 1.8) instead of the placeholder.
-     */
-    private static final java.util.Map<XMaterial, XMaterial> LEGACY_SUBSTITUTES = buildLegacySubstitutes();
-
-    private static java.util.Map<XMaterial, XMaterial> buildLegacySubstitutes() {
-        java.util.Map<XMaterial, XMaterial> m = new java.util.EnumMap<>(XMaterial.class);
-        m.put(XMaterial.NETHERITE_BLOCK, XMaterial.DIAMOND_BLOCK);
-        m.put(XMaterial.NETHERITE_INGOT, XMaterial.DIAMOND);
-        m.put(XMaterial.NETHERITE_SCRAP, XMaterial.IRON_NUGGET);
-        m.put(XMaterial.ANCIENT_DEBRIS, XMaterial.NETHERRACK);
-        m.put(XMaterial.BEEHIVE, XMaterial.DISPENSER);
-        m.put(XMaterial.BEE_NEST, XMaterial.DISPENSER);
-        m.put(XMaterial.HONEY_BLOCK, XMaterial.SLIME_BLOCK);
-        m.put(XMaterial.BARREL, XMaterial.CHEST);
-        m.put(XMaterial.BLAST_FURNACE, XMaterial.FURNACE);
-        m.put(XMaterial.SMOKER, XMaterial.FURNACE);
-        m.put(XMaterial.CAMPFIRE, XMaterial.NETHERRACK);
-        m.put(XMaterial.SMITHING_TABLE, XMaterial.CRAFTING_TABLE);
-        m.put(XMaterial.CARTOGRAPHY_TABLE, XMaterial.CRAFTING_TABLE);
-        m.put(XMaterial.FLETCHING_TABLE, XMaterial.CRAFTING_TABLE);
-        m.put(XMaterial.LOOM, XMaterial.CRAFTING_TABLE);
-        m.put(XMaterial.STONECUTTER, XMaterial.CRAFTING_TABLE);
-        m.put(XMaterial.GRINDSTONE, XMaterial.ANVIL);
-        m.put(XMaterial.LANTERN, XMaterial.GLOWSTONE);
-        m.put(XMaterial.COMPOSTER, XMaterial.CHEST);
-        m.put(XMaterial.MAGMA_BLOCK, XMaterial.NETHERRACK);
-        m.put(XMaterial.LODESTONE, XMaterial.IRON_BLOCK);
-        m.put(XMaterial.BLACKSTONE, XMaterial.COBBLESTONE);
-        m.put(XMaterial.OBSERVER, XMaterial.PISTON);
-        return m;
-    }
-
-    /**
-     * A sensible substitute {@link Material} that exists on the running server for an {@link XMaterial}
-     * that doesn't (e.g. {@code NETHERITE_BLOCK} -> {@code DIAMOND_BLOCK} on 1.8), or {@code null} if there
-     * is no mapping. Used as a smarter fallback than a generic placeholder for guide/category icons.
-     */
-    @Nullable
-    public static Material substitute(@Nonnull XMaterial xMaterial) {
-        XMaterial sub = LEGACY_SUBSTITUTES.get(xMaterial);
-        return sub != null ? sub.parseMaterial() : null;
-    }
-
     private MaterialCompat() {}
 
     /**
      * Builds an {@link ItemStack} from an {@link XMaterial}, substituting {@link #FALLBACK} when the
-     * material does not exist on the running (legacy) server. Replaces the unsafe
-     * {@code new ItemStack(xMaterial.parseMaterial())} idiom, which throws {@link NullPointerException}
-     * on legacy servers where {@link XMaterial#parseMaterial()} returns {@code null}.
+     * material does not exist.
      *
      * @param xMaterial
      *            The {@link XMaterial} to resolve
@@ -83,18 +36,12 @@ public final class MaterialCompat {
      */
     @Nonnull
     public static ItemStack stack(@Nonnull XMaterial xMaterial) {
-        // parseItem() carries the legacy data value on 1.8-1.12 (e.g. SKULL_ITEM:3 = player head,
-        // SKULL_ITEM:1 = wither skull, wool/dye colors). parseMaterial() drops it, yielding the data-0
-        // variant - so a player head would render as a skeleton skull. Fall back only if parseItem fails.
         ItemStack item = xMaterial.parseItem();
         if (item != null) {
             item.setAmount(1);
             return item;
         }
         Material material = xMaterial.parseMaterial();
-        if (material == null) {
-            material = substitute(xMaterial);
-        }
         return new ItemStack(material != null ? material : FALLBACK);
     }
 
@@ -117,9 +64,6 @@ public final class MaterialCompat {
             return item;
         }
         Material material = xMaterial.parseMaterial();
-        if (material == null) {
-            material = substitute(xMaterial);
-        }
         return new ItemStack(material != null ? material : FALLBACK, amount);
     }
 

@@ -105,10 +105,8 @@ public class OreCrusher extends MultiBlockMachine {
         recipes.add(SlimefunItems.COMPRESSED_CARBON.item());
         recipes.add(new SlimefunItemStack(SlimefunItems.CARBON, 4).item());
 
-        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {
-            recipes.add(MaterialCompat.stack(XMaterial.COBBLED_DEEPSLATE, 8));
-            recipes.add(new ItemStack(Material.SAND, 1));
-        }
+        recipes.add(MaterialCompat.stack(XMaterial.COBBLED_DEEPSLATE, 8));
+        recipes.add(new ItemStack(Material.SAND, 1));
     }
 
     public boolean isOreDoublingEnabled() {
@@ -140,28 +138,23 @@ public class OreCrusher extends MultiBlockMachine {
         // Raw metal ores (1.17+). Since newer Minecraft drops raw ore (not the ore block) without Silk
         // Touch, crushing raw ore yields the SAME doubled output as crushing the ore block would - so
         // players are not forced into Silk Touch just to benefit from ore doubling.
-        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {
-            displayRecipes.add(MaterialCompat.stack(XMaterial.RAW_IRON));
-            displayRecipes.add(new SlimefunItemStack(SlimefunItems.IRON_DUST, isOreDoublingEnabled() ? 2 : 1).item());
+        displayRecipes.add(MaterialCompat.stack(XMaterial.RAW_IRON));
+        displayRecipes.add(new SlimefunItemStack(SlimefunItems.IRON_DUST, isOreDoublingEnabled() ? 2 : 1).item());
 
-            displayRecipes.add(MaterialCompat.stack(XMaterial.RAW_COPPER));
-            displayRecipes.add(new SlimefunItemStack(SlimefunItems.COPPER_DUST, isOreDoublingEnabled() ? 2 : 1).item());
+        displayRecipes.add(MaterialCompat.stack(XMaterial.RAW_COPPER));
+        displayRecipes.add(new SlimefunItemStack(SlimefunItems.COPPER_DUST, isOreDoublingEnabled() ? 2 : 1).item());
 
-            displayRecipes.add(MaterialCompat.stack(XMaterial.RAW_GOLD));
-            displayRecipes.add(new SlimefunItemStack(SlimefunItems.GOLD_DUST, isOreDoublingEnabled() ? 2 : 1).item());
-        }
+        displayRecipes.add(MaterialCompat.stack(XMaterial.RAW_GOLD));
+        displayRecipes.add(new SlimefunItemStack(SlimefunItems.GOLD_DUST, isOreDoublingEnabled() ? 2 : 1).item());
 
-        // Deepslate Ores (1.17+)
-        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {
-            // @formatter:off
-            displayRecipes.addAll(Arrays.asList(
-                MaterialCompat.stack(XMaterial.DEEPSLATE_COAL_ORE), doubleOres.getCoal(),
-                MaterialCompat.stack(XMaterial.DEEPSLATE_LAPIS_ORE), doubleOres.getLapisLazuli(),
-                MaterialCompat.stack(XMaterial.DEEPSLATE_REDSTONE_ORE), doubleOres.getRedstone(),
-                MaterialCompat.stack(XMaterial.DEEPSLATE_DIAMOND_ORE), doubleOres.getDiamond(),
-                MaterialCompat.stack(XMaterial.DEEPSLATE_EMERALD_ORE), doubleOres.getEmerald()
-            ));
-            // @formatter:on
+        // Deepslate Ores
+        displayRecipes.addAll(Arrays.asList(
+            MaterialCompat.stack(XMaterial.DEEPSLATE_COAL_ORE), doubleOres.getCoal(),
+            MaterialCompat.stack(XMaterial.DEEPSLATE_LAPIS_ORE), doubleOres.getLapisLazuli(),
+            MaterialCompat.stack(XMaterial.DEEPSLATE_REDSTONE_ORE), doubleOres.getRedstone(),
+            MaterialCompat.stack(XMaterial.DEEPSLATE_DIAMOND_ORE), doubleOres.getDiamond(),
+            MaterialCompat.stack(XMaterial.DEEPSLATE_EMERALD_ORE), doubleOres.getEmerald()
+        ));
 
             displayRecipes.add(MaterialCompat.stack(XMaterial.DEEPSLATE_IRON_ORE));
             displayRecipes.add(new SlimefunItemStack(SlimefunItems.IRON_DUST, isOreDoublingEnabled() ? 2 : 1).item());
@@ -172,9 +165,8 @@ public class OreCrusher extends MultiBlockMachine {
             displayRecipes.add(MaterialCompat.stack(XMaterial.DEEPSLATE_COPPER_ORE));
             displayRecipes.add(new SlimefunItemStack(SlimefunItems.COPPER_DUST, isOreDoublingEnabled() ? 2 : 1).item());
 
-            displayRecipes.add(MaterialCompat.stack(XMaterial.COPPER_ORE));
-            displayRecipes.add(new SlimefunItemStack(SlimefunItems.COPPER_DUST, isOreDoublingEnabled() ? 2 : 1).item());
-        }
+        displayRecipes.add(MaterialCompat.stack(XMaterial.COPPER_ORE));
+        displayRecipes.add(new SlimefunItemStack(SlimefunItems.COPPER_DUST, isOreDoublingEnabled() ? 2 : 1).item());
     }
 
     @Override

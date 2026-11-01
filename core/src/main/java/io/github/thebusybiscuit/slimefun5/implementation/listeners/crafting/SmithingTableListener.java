@@ -46,10 +46,7 @@ public class SmithingTableListener implements SlimefunCraftingListener {
     }
 
     private int materialSlot() {
-        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_20)) {
-            return 2;
-        }
-        return 1;
+        return 2;
     }
 
 }

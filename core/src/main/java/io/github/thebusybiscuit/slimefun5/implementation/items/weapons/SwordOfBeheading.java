@@ -86,8 +86,7 @@ public class SwordOfBeheading extends SimpleSlimefunItem<EntityKillHandler> {
                     e.getDrops().add(MaterialCompat.stack(XMaterial.WITHER_SKELETON_SKULL));
                 }
             } else if (type == EntityCompat.entityType("PIGLIN")) {
-                if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_20) &&
-                    random.nextInt(100) < chancePiglin.getValue()) {
+                if (random.nextInt(100) < chancePiglin.getValue()) {
                     e.getDrops().add(MaterialCompat.stack(XMaterial.PIGLIN_HEAD));
                 }
             } else if (type == EntityCompat.entityType("PLAYER")) {

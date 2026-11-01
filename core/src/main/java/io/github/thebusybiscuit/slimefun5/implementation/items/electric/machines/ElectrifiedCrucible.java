@@ -40,11 +40,9 @@ public class ElectrifiedCrucible extends AContainer {
         registerRecipe(10, new ItemStack[] { new ItemStack(Material.BUCKET), MaterialCompat.stack(XMaterial.BLACKSTONE, 8) }, new ItemStack[] { new ItemStack(Material.LAVA_BUCKET) });
         registerRecipe(10, new ItemStack[] { new ItemStack(Material.BUCKET), MaterialCompat.stack(XMaterial.BASALT, 12) }, new ItemStack[] { new ItemStack(Material.LAVA_BUCKET) });
 
-        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {
-            registerRecipe(10, new ItemStack[] { new ItemStack(Material.BUCKET), MaterialCompat.stack(XMaterial.COBBLED_DEEPSLATE, 12) }, new ItemStack[] { new ItemStack(Material.LAVA_BUCKET) });
-            registerRecipe(10, new ItemStack[] { new ItemStack(Material.BUCKET), MaterialCompat.stack(XMaterial.DEEPSLATE, 10) }, new ItemStack[] { new ItemStack(Material.LAVA_BUCKET) });
-            registerRecipe(10, new ItemStack[] { new ItemStack(Material.BUCKET), MaterialCompat.stack(XMaterial.TUFF, 8) }, new ItemStack[] { new ItemStack(Material.LAVA_BUCKET) });
-        }
+        registerRecipe(10, new ItemStack[] { new ItemStack(Material.BUCKET), MaterialCompat.stack(XMaterial.COBBLED_DEEPSLATE, 12) }, new ItemStack[] { new ItemStack(Material.LAVA_BUCKET) });
+        registerRecipe(10, new ItemStack[] { new ItemStack(Material.BUCKET), MaterialCompat.stack(XMaterial.DEEPSLATE, 10) }, new ItemStack[] { new ItemStack(Material.LAVA_BUCKET) });
+        registerRecipe(10, new ItemStack[] { new ItemStack(Material.BUCKET), MaterialCompat.stack(XMaterial.TUFF, 8) }, new ItemStack[] { new ItemStack(Material.LAVA_BUCKET) });
     }
 
     @Override

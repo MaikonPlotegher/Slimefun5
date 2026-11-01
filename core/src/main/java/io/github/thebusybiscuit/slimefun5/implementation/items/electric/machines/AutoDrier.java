@@ -84,10 +84,8 @@ public class AutoDrier extends AContainer implements RecipeDisplayItem, NotHoppe
         recipeList.add(MaterialCompat.stack(XMaterial.COOKED_SALMON));
         recipeList.add(SlimefunItems.FISH_JERKY.item());
 
-        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_19)) {
-            recipeList.add(MaterialCompat.stack(XMaterial.MUD));
-            recipeList.add(new ItemStack(Material.CLAY));
-        }
+        recipeList.add(MaterialCompat.stack(XMaterial.MUD));
+        recipeList.add(new ItemStack(Material.CLAY));
 
         for (Material sapling : Tag.SAPLINGS.getValues()) {
             recipeList.add(new ItemStack(sapling));

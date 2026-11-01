@@ -43,9 +43,7 @@ public class IcyBow extends SlimefunBow {
                     return;
                 }
 
-                if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {
-                    ReflectionCompat.invoke(player, "setFreezeTicks", 60);
-                }
+                ReflectionCompat.invoke(player, "setFreezeTicks", 60);
             }
             n.getWorld().playEffect(n.getLocation(), Effect.STEP_SOUND, Material.ICE);
             n.getWorld().playEffect(n.getEyeLocation(), Effect.STEP_SOUND, Material.ICE);

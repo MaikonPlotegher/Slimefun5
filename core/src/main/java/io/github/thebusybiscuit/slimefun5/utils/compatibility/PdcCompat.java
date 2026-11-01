@@ -7,46 +7,27 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.bukkit.inventory.meta.ItemMeta;
-
 import io.github.thebusybiscuit.slimefun5.libraries.keys.NamespacedKey;
 
 /**
- * Java-8 universal port: a single, fully-reflective Persistent-Data (PDC) abstraction.
+ * Modern Persistent-Data (PDC) abstraction.
  * <p>
- * PDC is 1.14+. Rather than referencing {@code PersistentDataContainer}/{@code PersistentDataType}/
- * {@code PersistentDataHolder} (1.14+ types) in core bytecode, every operation here is reflective and
- * keyed by Slimefun's own {@link NamespacedKey} (converted to the real {@code org.bukkit.NamespacedKey}
- * via {@link BukkitKeys} only at the call into the server). On servers without PDC (1.8&ndash;1.13) the
- * container/type/key resolve to {@code null} and operations fall back per holder: item metas persist
- * through real item NBT ({@link NbtItemCompat}), holders with a stable id (players/entities) through a
- * YAML store, so callers are inherently version-safe. {@code typeName} is a {@code PersistentDataType}
- * field name such as {@code "STRING"}, {@code "BYTE"}, {@code "INTEGER"}, {@code "LONG"} or {@code "FLOAT"}.
+ * Keyed by Slimefun's {@link NamespacedKey} (converted to {@code org.bukkit.NamespacedKey} via {@link BukkitKeys}).
+ * All data operations operate directly on standard Bukkit {@code PersistentDataContainer} (1.14+).
  */
 public final class PdcCompat {
 
     private PdcCompat() {}
 
-    private static final boolean SUPPORTED = resolveSupported();
-
-    /**
-     * Cache sentinel. {@link ConcurrentHashMap} cannot store {@code null}, so a legacy server (where
-     * every resolution fails) would otherwise retry the reflection on every call.
-     */
     private static final Object UNAVAILABLE = new Object();
-
     private static final Class<?> DATA_TYPE_CLASS = resolveClass("org.bukkit.persistence.PersistentDataType");
     private static final ConcurrentHashMap<String, Object> DATA_TYPES = new ConcurrentHashMap<>();
 
     /**
-     * @return whether this server exposes the 1.14+ PersistentDataContainer API.
+     * @return whether this server exposes the PersistentDataContainer API (always true on 1.21+).
      */
     public static boolean isSupported() {
-        return SUPPORTED;
-    }
-
-    private static boolean resolveSupported() {
-        return resolveClass("org.bukkit.persistence.PersistentDataContainer") != null;
+        return true;
     }
 
     @Nullable
@@ -58,64 +39,11 @@ public final class PdcCompat {
         }
     }
 
-    /**
-     * Legacy (pre-1.14) fallback store for holders with a stable id (players/entities), keyed by UUID, so
-     * e.g. a player's chosen guide language sticks on 1.8. Item metas have no id and instead go through
-     * real item NBT ({@link NbtItemCompat}); a silent no-op there would lose item state (backpack identity,
-     * charge, soulbound, limited uses).
-     */
-    private static org.bukkit.configuration.file.YamlConfiguration legacyStore;
-    private static final org.bukkit.configuration.file.YamlConfiguration MEMORY_STORE = new org.bukkit.configuration.file.YamlConfiguration();
-    private static volatile Predicate<Object> keptInMemory = holder -> false;
-    private static java.io.File legacyFile;
+    /** Compatibility no-op for sandbox checks. */
+    public static void keepInMemory(@Nonnull Predicate<Object> holders) {}
 
-    private static synchronized org.bukkit.configuration.file.YamlConfiguration legacy() {
-        if (legacyStore == null) {
-            legacyFile = new java.io.File(io.github.thebusybiscuit.slimefun5.implementation.Slimefun.instance().getDataFolder(), "legacy-pdc.yml");
-            legacyStore = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(legacyFile);
-        }
-        return legacyStore;
-    }
-
-    /** Holders whose legacy data never reaches {@code legacy-pdc.yml}, such as everything the checks create. */
-    public static void keepInMemory(@Nonnull Predicate<Object> holders) {
-        keptInMemory = holders;
-    }
-
-    /** Drops what {@link #keepInMemory} held, once the holders it was for are gone. */
-    public static synchronized void forgetMemory() {
-        for (String key : MEMORY_STORE.getKeys(false)) {
-            MEMORY_STORE.set(key, null);
-        }
-    }
-
-    private static org.bukkit.configuration.file.YamlConfiguration storeFor(Object holder) {
-        return keptInMemory.test(holder) ? MEMORY_STORE : legacy();
-    }
-
-    private static void write(Object holder, String path, @Nullable Object value) {
-        org.bukkit.configuration.file.YamlConfiguration store = storeFor(holder);
-        store.set(path, value);
-        if (store != MEMORY_STORE) {
-            legacySave();
-        }
-    }
-
-    @Nullable
-    private static String legacyPath(Object holder, NamespacedKey key) {
-        Object id = ReflectionCompat.invoke(holder, "getUniqueId");
-        return id != null ? id + "." + key.toString().replace(':', '_').replace('.', '_') : null;
-    }
-
-    private static synchronized void legacySave() {
-        try {
-            if (legacyFile != null) {
-                legacyStore.save(legacyFile);
-            }
-        } catch (Exception ignored) {
-            // Best-effort persistence; never break a data write on a save failure.
-        }
-    }
+    /** Compatibility no-op for sandbox checks. */
+    public static void forgetMemory() {}
 
     @Nullable
     private static Object container(Object holder) {
@@ -141,32 +69,6 @@ public final class PdcCompat {
         }
     }
 
-    @Nullable
-    private static Object decodeNbt(@Nullable String raw, String typeName) {
-        if (raw == null) {
-            return null;
-        }
-
-        try {
-            switch (typeName) {
-                case "BYTE":
-                    return Byte.valueOf(raw);
-                case "INTEGER":
-                    return Integer.valueOf(raw);
-                case "LONG":
-                    return Long.valueOf(raw);
-                case "FLOAT":
-                    return Float.valueOf(raw);
-                case "DOUBLE":
-                    return Double.valueOf(raw);
-                default:
-                    return raw;
-            }
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
     public static void set(Object holder, NamespacedKey key, String typeName, Object value) {
         Object c = container(holder);
         Object t = dataType(typeName);
@@ -174,17 +76,6 @@ public final class PdcCompat {
 
         if (c != null && t != null && k != null) {
             ReflectionCompat.invoke(c, "set", k, t, value);
-            return;
-        }
-
-        if (holder instanceof ItemMeta) {
-            NbtItemCompat.setString((ItemMeta) holder, key.toString(), String.valueOf(value));
-            return;
-        }
-
-        String path = legacyPath(holder, key);
-        if (path != null) {
-            write(holder, path, value);
         }
     }
 
@@ -198,12 +89,7 @@ public final class PdcCompat {
             return ReflectionCompat.invoke(c, "get", k, t);
         }
 
-        if (holder instanceof ItemMeta) {
-            return decodeNbt(NbtItemCompat.getString((ItemMeta) holder, key.toString()), typeName);
-        }
-
-        String path = legacyPath(holder, key);
-        return path != null ? storeFor(holder).get(path) : null;
+        return null;
     }
 
     public static Object getOrDefault(Object holder, NamespacedKey key, String typeName, Object defaultValue) {
@@ -220,17 +106,11 @@ public final class PdcCompat {
             return Boolean.TRUE.equals(ReflectionCompat.invoke(c, "has", k, t));
         }
 
-        if (holder instanceof ItemMeta) {
-            return decodeNbt(NbtItemCompat.getString((ItemMeta) holder, key.toString()), typeName) != null;
-        }
-
-        String path = legacyPath(holder, key);
-        return path != null && storeFor(holder).contains(path);
+        return false;
     }
 
     /**
-     * Version-safe equality of two holders' PersistentDataContainers. On servers without PDC
-     * (1.8&ndash;1.13) the containers resolve to {@code null}; two such holders are treated as equal.
+     * Version-safe equality of two holders' PersistentDataContainers.
      */
     public static boolean containersEqual(Object holderA, Object holderB) {
         Object a = container(holderA);
@@ -249,17 +129,6 @@ public final class PdcCompat {
 
         if (c != null && k != null) {
             ReflectionCompat.invoke(c, "remove", k);
-            return;
-        }
-
-        if (holder instanceof ItemMeta) {
-            NbtItemCompat.remove((ItemMeta) holder, key.toString());
-            return;
-        }
-
-        String path = legacyPath(holder, key);
-        if (path != null) {
-            write(holder, path, null);
         }
     }
 

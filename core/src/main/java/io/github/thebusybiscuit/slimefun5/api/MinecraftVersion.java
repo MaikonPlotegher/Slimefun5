@@ -206,6 +206,15 @@ public enum MinecraftVersion {
     }
 
     /**
+     * This returns whether this version is supported as a server runtime by Slimefun (Minecraft 1.21+).
+     *
+     * @return Whether this version is a supported server runtime
+     */
+    public boolean isSupported() {
+        return !virtual && majorVersion >= 21;
+    }
+
+    /**
      * This tests if the given minecraft version number matches with this
      * {@link MinecraftVersion}.
      * <p>

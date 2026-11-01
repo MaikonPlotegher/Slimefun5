@@ -344,12 +344,6 @@ public class Slimefun extends JavaPlugin implements SlimefunAddon {
             StartupWarnings.oldJavaVersion(logger, RECOMMENDED_JAVA_VERSION);
         }
 
-        // Legacy Minecraft versions (1.8 - 1.15) are supported by this fork but only lightly tested, so
-        // warn the admin they are on experimental ground.
-        if (minecraftVersion.isBefore(MinecraftVersion.MINECRAFT_1_16)) {
-            StartupWarnings.experimentalVersion(logger, minecraftVersion.getName());
-        }
-
         // If the server has no "data-storage" folder, it's _probably_ a new install. So mark it for metrics.
         isNewlyInstalled = !new File("data-storage/Slimefun").exists();
 
@@ -774,7 +768,7 @@ public class Slimefun extends JavaPlugin implements SlimefunAddon {
             if (version > 0) {
                 // Check all supported versions of Minecraft
                 for (MinecraftVersion supportedVersion : MinecraftVersion.values()) {
-                    if (supportedVersion.isMinecraftVersion(version, patchVersion)) {
+                    if (supportedVersion.isSupported() && supportedVersion.isMinecraftVersion(version, patchVersion)) {
                         minecraftVersion = supportedVersion;
                         return false;
                     }
@@ -818,7 +812,7 @@ public class Slimefun extends JavaPlugin implements SlimefunAddon {
         List<String> list = new ArrayList<>();
 
         for (MinecraftVersion version : MinecraftVersion.values()) {
-            if (!version.isVirtual()) {
+            if (version.isSupported()) {
                 list.add(version.getName());
             }
         }
@@ -876,9 +870,7 @@ public class Slimefun extends JavaPlugin implements SlimefunAddon {
         register(() -> new BlockListener(this));
         register(() -> new VanillaContainerTitleListener(this));
         register(() -> new EnhancedFurnaceListener(this));
-        if (minecraftVersion.isAtLeast(MinecraftVersion.MINECRAFT_1_12)) {
-            register(() -> new ItemPickupListener(this));
-        }
+        register(() -> new ItemPickupListener(this));
         register(() -> new ItemDropListener(this));
         register(() -> new ItemCanonicalizationListener(this));
         register(() -> new DeathpointListener(this));
@@ -890,15 +882,10 @@ public class Slimefun extends JavaPlugin implements SlimefunAddon {
         register(() -> new EntityInteractionListener(this));
         register(() -> new MobDropListener(this));
         register(() -> new VillagerTradingListener(this));
-        if (minecraftVersion.isAtLeast(MinecraftVersion.MINECRAFT_1_9)) {
-            register(() -> new ElytraImpactListener(this));
-        }
+        register(() -> new ElytraImpactListener(this));
         register(() -> new CraftingTableListener(this));
         register(() -> new AnvilListener(this));
-        if (minecraftVersion.isAtLeast(MinecraftVersion.MINECRAFT_1_9)) {
-            // PrepareAnvilEvent is 1.9+; used to preserve player renames of Slimefun items.
-            register(() -> new AnvilRenameListener(this));
-        }
+        register(() -> new AnvilRenameListener(this));
         register(() -> new BrewingStandListener(this));
         register(() -> new CauldronListener(this));
         register(() -> new GrindstoneListener(this));
@@ -908,21 +895,15 @@ public class Slimefun extends JavaPlugin implements SlimefunAddon {
         register(() -> new NetworkListener(this, networkManager));
         register(() -> new HopperListener(this));
         register(() -> new TalismanListener(this));
-        if (minecraftVersion.isAtLeast(MinecraftVersion.MINECRAFT_1_13)) {
-            register(() -> new TalismanBlockDropListener(this));
-        }
+        register(() -> new TalismanBlockDropListener(this));
         register(() -> new SoulboundListener(this));
         register(() -> new AutoCrafterListener(this));
         register(() -> new SlimefunItemHitListener(this));
         register(() -> new MiddleClickListener(this));
-        if (minecraftVersion.isAtLeast(MinecraftVersion.MINECRAFT_1_15)) {
-            register(() -> new BeeListener(this));
-            register(() -> new BeeWingsListener(this, (BeeWings) SlimefunItems.BEE_WINGS.getItem()));
-        }
-        if (minecraftVersion.isAtLeast(MinecraftVersion.MINECRAFT_1_16)) {
-            register(() -> new PiglinListener(this));
-            register(() -> new SmithingTableListener(this));
-        }
+        register(() -> new BeeListener(this));
+        register(() -> new BeeWingsListener(this, (BeeWings) SlimefunItems.BEE_WINGS.getItem()));
+        register(() -> new PiglinListener(this));
+        register(() -> new SmithingTableListener(this));
         register(() -> new JoinListener(this));
 
         // Item-specific Listeners

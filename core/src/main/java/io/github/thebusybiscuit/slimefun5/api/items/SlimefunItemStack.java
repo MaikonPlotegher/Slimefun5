@@ -96,11 +96,6 @@ public class SlimefunItemStack {
         Slimefun.getItemDataService().setItemData(meta, id);
         Slimefun.getItemTextureService().setTexture(meta, id);
 
-        if (!isInternalChromeId(id)) {
-            meta.setDisplayName(id);
-            meta.setLore(null);
-        }
-
         setItemMeta(meta);
     }
 
@@ -239,12 +234,8 @@ public class SlimefunItemStack {
         });
     }
 
-    /** Shared body for the deprecated name/lore constructors: see {@link #isInternalChromeId(String)}. */
+    /** Shared body for name/lore constructors. */
     private static void applyChromeNameAndLore(@Nonnull String id, @Nonnull ItemMeta im, @Nullable String name, @Nonnull String... lore) {
-        if (!isInternalChromeId(id)) {
-            return;
-        }
-
         if (name != null) {
             im.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
         }

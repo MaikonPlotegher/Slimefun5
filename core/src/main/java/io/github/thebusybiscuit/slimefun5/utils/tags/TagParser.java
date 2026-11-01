@@ -205,8 +205,7 @@ public class TagParser implements Keyed {
      *         vanilla tags are absent (so missing entries are expected rather than misconfigured).
      */
     private static boolean isLegacyServer() {
-        MinecraftVersion version = Slimefun.getMinecraftVersion();
-        return version != null && version.isBefore(MinecraftVersion.MINECRAFT_1_13);
+        return false;
     }
 
     @ParametersAreNonnullByDefault

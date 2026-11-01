@@ -8,7 +8,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import io.github.thebusybiscuit.slimefun5.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun5.libraries.keys.NamespacedKey;
-import io.github.thebusybiscuit.slimefun5.utils.compatibility.NbtItemCompat;
 import io.github.thebusybiscuit.slimefun5.utils.compatibility.PdcCompat;
 
 /**
@@ -39,11 +38,7 @@ public final class RenamedItems {
 
     /** Marks the given meta as carrying a player-applied custom name. */
     public static void mark(@Nonnull ItemMeta meta) {
-        if (PdcCompat.isSupported()) {
-            PdcCompat.setString(meta, key(), MARKER);
-        } else {
-            NbtItemCompat.setString(meta, key().toString(), MARKER);
-        }
+        PdcCompat.setString(meta, key(), MARKER);
     }
 
     /** @return whether the given meta was marked as player-renamed. */
@@ -52,10 +47,7 @@ public final class RenamedItems {
             return false;
         }
 
-        String value = PdcCompat.isSupported()
-            ? PdcCompat.getString(meta, key())
-            : NbtItemCompat.getString(meta, key().toString());
-
+        String value = PdcCompat.getString(meta, key());
         return MARKER.equals(value);
     }
 

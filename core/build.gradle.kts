@@ -39,9 +39,8 @@ group = "com.github.slimefun"
 // Version + displayVersion come from the shared Slimefun5/gradle snippet (the git-tag resolver + build
 // suffix), reused by every addon so the logic lives in one place. Core's default fallback differs from
 // the addons' (5.0.0 vs 1.0.0) - set it before applying.
-extra["sfDefaultVersion"] = "5.0.0"
-apply(from = "https://raw.githubusercontent.com/Slimefun5/gradle/main/version.gradle")
-val displayVersion = project.extra["displayVersion"].toString()
+extra["sfDefaultVersion"] = "1.0"
+val displayVersion = "v1.0"
 description = "Slimefun is a Paper plugin that simulates a modpack-like atmosphere by adding over 500 new items and recipes to your Minecraft Server."
 
 github {
@@ -499,7 +498,7 @@ tasks {
     }
 
     shadowJar {
-        archiveBaseName.set("Slimefun")
+        archiveBaseName.set("Slimefun5")
         archiveVersion.set(displayVersion)
         archiveClassifier.set("")
 
@@ -726,7 +725,7 @@ val cloneAndBuildAddons by tasks.registering {
 
         // Addon build files reference the core jar by a relative path valid only in the old layout;
         // rewrite it to the absolute jar path after each checkout (reset --hard reverts it every run).
-        val coreJarFile = project.layout.buildDirectory.file("libs/Slimefun-$displayVersion.jar").get().asFile
+        val coreJarFile = project.layout.buildDirectory.file("libs/Slimefun5-$displayVersion.jar").get().asFile
         val coreJarPath = coreJarFile.absolutePath.replace("\\", "/")
         if (!coreJarFile.exists()) {
             println("WARNING: Core jar not found at ${coreJarFile.absolutePath} - addon compiles will fail until :core:shadowJar produces it.")

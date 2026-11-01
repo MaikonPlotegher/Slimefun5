@@ -55,26 +55,17 @@ public class ExplosiveTool extends SimpleSlimefunItem<ToolUseHandler> implements
     private final ItemSetting<Boolean> damageOnUse = new ItemSetting<>(this, "damage-on-use", true);
     private final ItemSetting<Boolean> callExplosionEvent = new ItemSetting<>(this, "call-explosion-event", false);
 
-    private static Constructor<?> pre21ExplodeEventConstructor;
     // The 1.21 BlockExplodeEvent ctor takes an org.bukkit.ExplosionResult, a type absent on the 1.8.8
-    // floor - resolved reflectively so it is never referenced as a type. Null on older servers.
+    // floor - resolved reflectively so it is never referenced as a type.
     private static Constructor<?> explodeEventConstructor1_21;
     private static Object explosionResultDestroy;
     static {
-        if (Slimefun.getMinecraftVersion().isBefore(MinecraftVersion.MINECRAFT_1_21)) {
-            try {
-                pre21ExplodeEventConstructor = BlockExplodeEvent.class.getConstructor(Block.class, List.class, float.class);
-            } catch (Exception e) {
-                Slimefun.logger().log(Level.SEVERE, "Could not find constructor for BlockExplodeEvent", e);
-            }
-        } else {
-            try {
-                Class<?> resultClass = Class.forName("org.bukkit.ExplosionResult");
-                explosionResultDestroy = Enum.valueOf(resultClass.asSubclass(Enum.class), "DESTROY");
-                explodeEventConstructor1_21 = BlockExplodeEvent.class.getConstructor(Block.class, BlockState.class, List.class, float.class, resultClass);
-            } catch (Exception e) {
-                Slimefun.logger().log(Level.SEVERE, "Could not find 1.21 constructor for BlockExplodeEvent", e);
-            }
+        try {
+            Class<?> resultClass = Class.forName("org.bukkit.ExplosionResult");
+            explosionResultDestroy = Enum.valueOf(resultClass.asSubclass(Enum.class), "DESTROY");
+            explodeEventConstructor1_21 = BlockExplodeEvent.class.getConstructor(Block.class, BlockState.class, List.class, float.class, resultClass);
+        } catch (Exception e) {
+            Slimefun.logger().log(Level.SEVERE, "Could not find 1.21 constructor for BlockExplodeEvent", e);
         }
     }
 
@@ -221,28 +212,15 @@ public class ExplosiveTool extends SimpleSlimefunItem<ToolUseHandler> implements
         List<Block> blocks,
         float yield
     ) {
-        MinecraftVersion version = Slimefun.getMinecraftVersion();
-        if (version.isAtLeast(MinecraftVersion.MINECRAFT_1_21)) {
-            if (explodeEventConstructor1_21 != null && explosionResultDestroy != null) {
-                try {
-                    return (BlockExplodeEvent) explodeEventConstructor1_21.newInstance(block, block.getState(), blocks, yield, explosionResultDestroy);
-                } catch (Exception e) {
-                    Slimefun.logger().log(Level.SEVERE, "Could not construct BlockExplodeEvent", e);
-                }
-            }
-
-            return null;
-        } else if (pre21ExplodeEventConstructor != null) {
+        if (explodeEventConstructor1_21 != null && explosionResultDestroy != null) {
             try {
-                return (BlockExplodeEvent) pre21ExplodeEventConstructor.newInstance(block, blocks, yield);
+                return (BlockExplodeEvent) explodeEventConstructor1_21.newInstance(block, block.getState(), blocks, yield, explosionResultDestroy);
             } catch (Exception e) {
-                Slimefun.logger().log(Level.SEVERE, "Could not find constructor for BlockExplodeEvent", e);
+                Slimefun.logger().log(Level.SEVERE, "Could not construct BlockExplodeEvent", e);
             }
-
-            return null;
-        } else {
-            throw new IllegalStateException("BlockExplodeEvent constructor not found");
         }
+
+        return null;
     }
 }
 

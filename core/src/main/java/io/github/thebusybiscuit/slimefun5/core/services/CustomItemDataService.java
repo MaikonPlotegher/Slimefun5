@@ -1,6 +1,5 @@
 package io.github.thebusybiscuit.slimefun5.core.services;
 
-import io.github.thebusybiscuit.slimefun5.utils.compatibility.NbtItemCompat;
 import io.github.thebusybiscuit.slimefun5.utils.compatibility.PdcCompat;
 
 import java.util.Optional;
@@ -86,12 +85,7 @@ public class CustomItemDataService implements Keyed {
         Validate.notNull(meta, "The ItemMeta cannot be null!");
         Validate.notNull(id, "Cannot store null on an ItemMeta!");
 
-        if (PdcCompat.isSupported()) {
-            PdcCompat.set(meta, namespacedKey, "STRING", id);
-        } else {
-            // Pre-1.14 has no PDC; fall back to storing the id in real item NBT.
-            NbtItemCompat.setString(meta, namespacedKey.toString(), id);
-        }
+        PdcCompat.set(meta, namespacedKey, "STRING", id);
     }
 
     /**
@@ -124,10 +118,7 @@ public class CustomItemDataService implements Keyed {
     public @Nonnull Optional<String> getItemData(@Nonnull ItemMeta meta) {
         Validate.notNull(meta, "Cannot read data from null!");
 
-        String value = PdcCompat.isSupported()
-                ? (String) PdcCompat.get(meta, namespacedKey, "STRING")
-                : NbtItemCompat.getString(meta, namespacedKey.toString());
-
+        String value = (String) PdcCompat.get(meta, namespacedKey, "STRING");
         return Optional.ofNullable(value);
     }
 

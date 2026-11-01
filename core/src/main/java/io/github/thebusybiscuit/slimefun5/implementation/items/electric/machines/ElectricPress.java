@@ -79,14 +79,12 @@ public class ElectricPress extends AContainer implements RecipeDisplayItem {
 
         addRecipe(16, MaterialCompat.stack(XMaterial.NETHERITE_INGOT, 9), MaterialCompat.stack(XMaterial.NETHERITE_BLOCK));
 
-        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {
-            addRecipe(4, MaterialCompat.stack(XMaterial.AMETHYST_SHARD, 4), MaterialCompat.stack(XMaterial.AMETHYST_BLOCK));
+        addRecipe(4, MaterialCompat.stack(XMaterial.AMETHYST_SHARD, 4), MaterialCompat.stack(XMaterial.AMETHYST_BLOCK));
 
-            addRecipe(5, MaterialCompat.stack(XMaterial.COPPER_INGOT, 9), MaterialCompat.stack(XMaterial.COPPER_BLOCK));
-            addRecipe(5, MaterialCompat.stack(XMaterial.RAW_IRON, 9), MaterialCompat.stack(XMaterial.RAW_IRON_BLOCK));
-            addRecipe(5, MaterialCompat.stack(XMaterial.RAW_GOLD, 9), MaterialCompat.stack(XMaterial.RAW_GOLD_BLOCK));
-            addRecipe(5, MaterialCompat.stack(XMaterial.RAW_COPPER, 9), MaterialCompat.stack(XMaterial.RAW_COPPER_BLOCK));
-        }
+        addRecipe(5, MaterialCompat.stack(XMaterial.COPPER_INGOT, 9), MaterialCompat.stack(XMaterial.COPPER_BLOCK));
+        addRecipe(5, MaterialCompat.stack(XMaterial.RAW_IRON, 9), MaterialCompat.stack(XMaterial.RAW_IRON_BLOCK));
+        addRecipe(5, MaterialCompat.stack(XMaterial.RAW_GOLD, 9), MaterialCompat.stack(XMaterial.RAW_GOLD_BLOCK));
+        addRecipe(5, MaterialCompat.stack(XMaterial.RAW_COPPER, 9), MaterialCompat.stack(XMaterial.RAW_COPPER_BLOCK));
     }
 
     @ParametersAreNonnullByDefault

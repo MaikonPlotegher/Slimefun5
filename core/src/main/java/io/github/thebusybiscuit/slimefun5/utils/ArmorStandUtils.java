@@ -51,18 +51,7 @@ public class ArmorStandUtils {
      * @return The spawned {@link ArmorStand}
      */
     public static @Nonnull ArmorStand spawnArmorStand(@Nonnull Location location) {
-        // The consumer method was moved from World to RegionAccessor in 1.20.2
-        // Due to this, we need to use a rubbish workaround to support 1.20.1 and below
-        // This causes flicker on these versions which sucks but not sure a better way around this right now.
-        if (PaperLib.getMinecraftVersion() < 20 ||
-                (PaperLib.getMinecraftVersion() == 20 && PaperLib.getMinecraftPatchVersion() < 2)) {
-            ArmorStand armorStand = location.getWorld().spawn(location, ArmorStand.class);
-            setupArmorStand(armorStand);
-            return armorStand;
-        }
-
-        // The pre-spawn consumer overload of World#spawn is 1.11+; reached reflectively to keep its
-        // flicker-free behaviour on modern servers (this branch only runs on 1.20.2+).
+        // The pre-spawn consumer overload of World#spawn ensures flicker-free spawning
         java.util.function.Consumer<ArmorStand> setup = ArmorStandUtils::setupArmorStand;
         Object spawned = ReflectionCompat.invoke(location.getWorld(), "spawn", location, ArmorStand.class, setup);
 

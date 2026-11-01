@@ -23,15 +23,7 @@ public class VersionedItemFlag {
     public static final @Nullable ItemFlag HIDE_ENCHANTS;
 
     static {
-        MinecraftVersion version = Slimefun.getMinecraftVersion();
-
-        if (version != null && version.isAtLeast(MinecraftVersion.MINECRAFT_1_20_5)) {
-            ItemFlag flag = getKey("HIDE_ADDITIONAL_TOOLTIP");
-            HIDE_ADDITIONAL_TOOLTIP = flag != null ? flag : getKey("HIDE_POTION_EFFECTS");
-        } else {
-            HIDE_ADDITIONAL_TOOLTIP = getKey("HIDE_POTION_EFFECTS");
-        }
-
+        HIDE_ADDITIONAL_TOOLTIP = getKey("HIDE_ADDITIONAL_TOOLTIP");
         HIDE_ATTRIBUTES = getKey("HIDE_ATTRIBUTES");
         HIDE_ENCHANTS = getKey("HIDE_ENCHANTS");
     }

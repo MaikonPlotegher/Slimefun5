@@ -159,8 +159,7 @@ public class BiomeMapParser<T> {
     }
 
     private static boolean isLegacyServer() {
-        MinecraftVersion version = Slimefun.getMinecraftVersion();
-        return version != null && version.isBefore(MinecraftVersion.MINECRAFT_1_13);
+        return false;
     }
 
     private @Nonnull Set<Biome> readBiomes(@Nonnull JsonArray array) throws BiomeMapException {

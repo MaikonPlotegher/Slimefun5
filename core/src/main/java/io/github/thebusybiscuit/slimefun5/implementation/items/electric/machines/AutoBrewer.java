@@ -108,9 +108,6 @@ public class AutoBrewer extends AContainer implements NotHopperable {
 
     @ParametersAreNonnullByDefault
     private @Nullable ItemStack brew(Material input, Material potionType, PotionMeta potion) {
-        if (Slimefun.getMinecraftVersion().isBefore(20,2)) {
-            return brewPreBasePotionType(input, potionType, potion);
-        }
         PotionType type = PotionCompat.getBasePotionType(potion);
         if (type == PotionType.WATER) {
             if (input == Material.FERMENTED_SPIDER_EYE) {
@@ -148,49 +145,6 @@ public class AutoBrewer extends AContainer implements NotHopperable {
             }
         }
 
-        return null;
-    }
-
-    @ParametersAreNonnullByDefault
-    @SuppressWarnings("deprecation")
-    private ItemStack brewPreBasePotionType(Material input, Material potionType, PotionMeta potion) {
-        PotionData data = PotionCompat.getBasePotionData(potion);
-        PotionType type = data.getType();
-        if (type == PotionType.WATER) {
-            if (input == Material.FERMENTED_SPIDER_EYE) {
-                PotionCompat.setBasePotionData(potion, new PotionData(PotionType.WEAKNESS, false, false));
-                return new ItemStack(potionType);
-            } else if (input == XMaterial.NETHER_WART.parseMaterial()) {
-                PotionCompat.setBasePotionData(potion, new PotionData(VersionedPotionType.AWKWARD, false, false));
-                return new ItemStack(potionType);
-            } else if (potionType == Material.POTION && input == XMaterial.GUNPOWDER.parseMaterial()) {
-                return MaterialCompat.stack(XMaterial.SPLASH_POTION);
-            } else if (potionType == XMaterial.SPLASH_POTION.parseMaterial() && input == XMaterial.DRAGON_BREATH.parseMaterial()) {
-                return MaterialCompat.stack(XMaterial.LINGERING_POTION);
-            }
-        } else if (input == Material.FERMENTED_SPIDER_EYE) {
-            PotionType fermented = fermentations.get(type);
-
-            if (fermented != null) {
-                PotionCompat.setBasePotionData(potion, new PotionData(fermented, data.isExtended(), data.isUpgraded()));
-                return new ItemStack(potionType);
-            }
-        } else if (input == Material.REDSTONE && PotionCompat.isExtendable(type) && !data.isUpgraded()) {
-            // Fixes #3390 - Potions can only be either extended or upgraded. Not both.
-            PotionCompat.setBasePotionData(potion, new PotionData(type, true, false));
-            return new ItemStack(potionType);
-        } else if (input == Material.GLOWSTONE_DUST && PotionCompat.isUpgradeable(type) && !data.isExtended()) {
-            // Fixes #3390 - Potions can only be either extended or upgraded. Not both.
-            PotionCompat.setBasePotionData(potion, new PotionData(type, false, true));
-            return new ItemStack(potionType);
-        } else if (type == VersionedPotionType.AWKWARD) {
-            PotionType potionRecipe = potionRecipes.get(input);
-
-            if (potionRecipe != null) {
-                PotionCompat.setBasePotionData(potion, new PotionData(potionRecipe, false, false));
-                return new ItemStack(potionType);
-            }
-        }
         return null;
     }
 

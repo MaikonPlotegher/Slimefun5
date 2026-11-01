@@ -78,13 +78,7 @@ public class TreeGrowthAccelerator extends AbstractGrowthAccelerator {
 
     @ParametersAreNonnullByDefault
     private boolean tryToBoostGrowth(Block machine, BlockMenu inv, Block sapling) {
-        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {
-            // On 1.17+ we can actually simulate bonemeal :O
-            return applyBoneMeal(machine, sapling, inv);
-        } else {
-            Object saplingData = BlockDataCompat.getBlockData(sapling);
-            return BlockDataCompat.getInt(saplingData, "getStage") < BlockDataCompat.getInt(saplingData, "getMaximumStage") && updateSaplingData(machine, sapling, inv, saplingData);
-        }
+        return applyBoneMeal(machine, sapling, inv);
     }
 
     @ParametersAreNonnullByDefault
@@ -97,24 +91,6 @@ public class TreeGrowthAccelerator extends AbstractGrowthAccelerator {
 
                 inv.consumeItem(slot);
                 ParticleCompat.spawn(sapling.getWorld(), VersionedParticle.HAPPY_VILLAGER, sapling.getLocation().add(0.5D, 0.5D, 0.5D), 4, 0.1F, 0.1F, 0.1F);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    @ParametersAreNonnullByDefault
-    private boolean updateSaplingData(Block machine, Block block, BlockMenu inv, Object sapling) {
-        for (int slot : getInputSlots()) {
-            if (isFertilizer(inv.getItemInSlot(slot))) {
-                removeCharge(machine.getLocation(), ENERGY_CONSUMPTION);
-
-                BlockDataCompat.set(sapling, "setStage", BlockDataCompat.getInt(sapling, "getStage") + 1);
-                BlockDataCompat.setBlockData(block, sapling, false);
-
-                inv.consumeItem(slot);
-                ParticleCompat.spawn(block.getWorld(), VersionedParticle.HAPPY_VILLAGER, block.getLocation().add(0.5D, 0.5D, 0.5D), 4, 0.1F, 0.1F, 0.1F);
                 return true;
             }
         }

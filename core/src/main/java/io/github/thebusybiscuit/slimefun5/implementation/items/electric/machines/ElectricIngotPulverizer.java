@@ -58,9 +58,7 @@ public class ElectricIngotPulverizer extends AContainer implements RecipeDisplay
         // Vanilla Gold Ingot to Slimefun gold dust and Vanilla Copper Ingot into Slimefun copper dust
         registerRecipe(3, new ItemStack(Material.GOLD_INGOT), SlimefunItems.GOLD_DUST.item());
 
-        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {
-            registerRecipe(3, MaterialCompat.stack(XMaterial.COPPER_INGOT), SlimefunItems.COPPER_DUST.item());
-        }
+        registerRecipe(3, MaterialCompat.stack(XMaterial.COPPER_INGOT), SlimefunItems.COPPER_DUST.item());
     }
 
     @Override

@@ -279,24 +279,35 @@ public class ItemTranslationService {
     }
 
     /**
-     * Bakes every registered item's template to id-only: display name = the raw id, no lore. No baked
-     * text may ever show on a surface the packet layer does not reach (dropped items, item frames, entity
-     * equipment, villager trades, unsupported server versions, or {@code translation.packets=false}) - the
-     * packet layer is the only place a translated/composed display is produced, per viewer, at send time.
+     * Bakes every registered item's template with its localized display name and lore directly
+     * into the ItemStack's ItemMeta (classic Slimefun4 style), sourcing texts from the translation
+     * files (defaulting to pt-BR/pt) so no text is hardcoded in Java.
      */
     public void canonicalizeToId() {
+        String lang = Slimefun.getCfg().getString("options.language");
+        if (lang == null || lang.isEmpty() || "en".equalsIgnoreCase(lang)) {
+            lang = "pt-BR";
+        }
+
         for (SlimefunItem item : Slimefun.getRegistry().getEnabledSlimefunItems()) {
             if (item instanceof VanillaItem) {
                 continue; // deliberately no custom name/lore so the vanilla client localizes it
             }
 
             try {
-                // Snapshotted before the bake call below (which rewrites the name to the id and strips
-                // the lore), so renderForPacket's fallback chain, the coverage UI and the lore audit keep a
-                // stable per-id reference to whatever text the addon shipped.
                 englishBaseline.putIfAbsent(item.getId(), item.getItem().clone());
 
-                item.bakeTranslatedDisplay(item.getId(), Collections.<String>emptyList());
+                RenderedDisplay display = renderForPacket(item.getId(), lang, TranslationConfig.FallbackMode.ENGLISH, true);
+                if (display != null && display.name != null && !display.name.equals(item.getId())) {
+                    item.bakeTranslatedDisplay(display.name, display.lore);
+                } else {
+                    RenderedDisplay ptDisplay = renderForPacket(item.getId(), "pt", TranslationConfig.FallbackMode.ENGLISH, true);
+                    if (ptDisplay != null && ptDisplay.name != null && !ptDisplay.name.equals(item.getId())) {
+                        item.bakeTranslatedDisplay(ptDisplay.name, ptDisplay.lore);
+                    } else if (display != null) {
+                        item.bakeTranslatedDisplay(display.name, display.lore);
+                    }
+                }
             } catch (Exception | LinkageError ignored) {
                 // a single broken item must not abort the pass
             }
@@ -333,6 +344,18 @@ public class ItemTranslationService {
 
             if (exact != null) {
                 return exact;
+            }
+        }
+
+        if ("pt-BR".equals(language)) {
+            Map<String, ItemTranslation> ptMap = byLanguage.get("pt");
+            if (ptMap != null && ptMap.containsKey(itemId)) {
+                return ptMap.get(itemId);
+            }
+        } else if ("pt".equals(language)) {
+            Map<String, ItemTranslation> ptBrMap = byLanguage.get("pt-BR");
+            if (ptBrMap != null && ptBrMap.containsKey(itemId)) {
+                return ptBrMap.get(itemId);
             }
         }
 

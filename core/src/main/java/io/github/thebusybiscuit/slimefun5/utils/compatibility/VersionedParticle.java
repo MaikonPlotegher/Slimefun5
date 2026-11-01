@@ -26,61 +26,14 @@ public class VersionedParticle {
     public static final Particle ENCHANT;
 
     static {
-        // org.bukkit.Particle is a 1.9+ type. On 1.8 it doesn't exist, so touching Particle.class or
-        // Particle.X here would fail class initialization (NoClassDefFoundError). Guard on the API's
-        // presence and leave every field null pre-1.9 - ParticleCompat already no-ops on a null particle.
-        if (!classExists("org.bukkit.Particle")) {
-            DUST = null;
-            SMOKE = null;
-            HAPPY_VILLAGER = null;
-            ENCHANTED_HIT = null;
-            EXPLOSION = null;
-            WITCH = null;
-            FIREWORK = null;
-            ENCHANT = null;
-        } else {
-        MinecraftVersion version = Slimefun.getMinecraftVersion();
-
-        // REDSTONE is renamed to DUST in 1.20.5
-        DUST = version.isAtLeast(MinecraftVersion.MINECRAFT_1_20_5)
-            ? Particle.DUST
-            : getKey("REDSTONE");
-
-        // SMOKE_NORMAL is renamed to SMOKE in 1.20.5
-        SMOKE = version.isAtLeast(MinecraftVersion.MINECRAFT_1_20_5)
-            ? Particle.SMOKE
-            : getKey("SMOKE_NORMAL");
-    
-        // VILLAGER_HAPPY is renamed to HAPPY_VILLAGER in 1.20.5
-        HAPPY_VILLAGER = version.isAtLeast(MinecraftVersion.MINECRAFT_1_20_5)
-            ? Particle.HAPPY_VILLAGER
-            : getKey("VILLAGER_HAPPY");
-
-        // CRIT_MAGIC is renamed to ENCHANTED_HIT in 1.20.5
-        ENCHANTED_HIT = version.isAtLeast(MinecraftVersion.MINECRAFT_1_20_5)
-            ? Particle.ENCHANTED_HIT
-            : getKey("CRIT_MAGIC");
-        
-        // EXPLOSION_LARGE is renamed to EXPLOSION in 1.20.5
-        EXPLOSION = version.isAtLeast(MinecraftVersion.MINECRAFT_1_20_5)
-            ? Particle.EXPLOSION
-            : getKey("EXPLOSION_LARGE");
-        
-        // SPELL_WITCH is renamed to WITCH in 1.20.5
-        WITCH = version.isAtLeast(MinecraftVersion.MINECRAFT_1_20_5)
-            ? Particle.WITCH
-            : getKey("SPELL_WITCH");
-        
-        // FIREWORKS_SPARK is renamed to FIREWORK in 1.20.5
-        FIREWORK = version.isAtLeast(MinecraftVersion.MINECRAFT_1_20_5)
-            ? Particle.FIREWORK
-            : getKey("FIREWORKS_SPARK");
-        
-        // ENCHANTMENT_TABLE is renamed to ENCHANT in 1.20.5
-        ENCHANT = version.isAtLeast(MinecraftVersion.MINECRAFT_1_20_5)
-            ? Particle.ENCHANT
-            : getKey("ENCHANTMENT_TABLE");
-        }
+        DUST = Particle.DUST;
+        SMOKE = Particle.SMOKE;
+        HAPPY_VILLAGER = Particle.HAPPY_VILLAGER;
+        ENCHANTED_HIT = Particle.ENCHANTED_HIT;
+        EXPLOSION = Particle.EXPLOSION;
+        WITCH = Particle.WITCH;
+        FIREWORK = Particle.FIREWORK;
+        ENCHANT = Particle.ENCHANT;
     }
 
     private static boolean classExists(@Nonnull String name) {

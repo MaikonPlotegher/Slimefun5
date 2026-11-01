@@ -206,11 +206,7 @@ public class FluidPump extends SimpleSlimefunItem<BlockTicker> implements Invent
         if (type == XMaterial.WATER.parseMaterial() || type == XMaterial.BUBBLE_COLUMN.parseMaterial()) {
             ItemStack waterBottle = new ItemStack(Material.POTION);
             PotionMeta meta = (PotionMeta) waterBottle.getItemMeta();
-            if (Slimefun.getMinecraftVersion().isBefore(20, 2)) {
-                PotionCompat.setBasePotionData(meta, new PotionData(PotionType.WATER));
-            } else {
-                PotionCompat.setBasePotionType(meta, PotionType.WATER);
-            }
+            PotionCompat.setBasePotionType(meta, PotionType.WATER);
             waterBottle.setItemMeta(meta);
             return waterBottle;
         } else {

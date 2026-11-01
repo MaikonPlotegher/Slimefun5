@@ -838,11 +838,7 @@ public final class SlimefunItemSetup {
 
         ItemStack weaknessPotion = new ItemStack(Material.POTION);
         PotionMeta meta = (PotionMeta) weaknessPotion.getItemMeta();
-        if (Slimefun.getMinecraftVersion().isBefore(20, 2)) {
-            PotionCompat.setBasePotionData(meta, PotionType.WEAKNESS, false, false);
-        } else {
-            PotionCompat.setBasePotionType(meta, PotionType.WEAKNESS);
-        }
+        PotionCompat.setBasePotionType(meta, PotionType.WEAKNESS);
         weaknessPotion.setItemMeta(meta);
 
         new MagicalZombiePills(itemGroups.magicalGadgets, SlimefunItems.MAGICAL_ZOMBIE_PILLS, RecipeType.MAGIC_WORKBENCH,
@@ -2645,8 +2641,6 @@ public final class SlimefunItemSetup {
                 new ItemStack[] {SlimefunItems.SILICON.item(), MaterialCompat.stack(XMaterial.YELLOW_DYE), SlimefunItems.SILICON.item(), MaterialCompat.stack(XMaterial.YELLOW_DYE), new ItemStack(Material.STRING), MaterialCompat.stack(XMaterial.YELLOW_DYE), SlimefunItems.GILDED_IRON.item(), MaterialCompat.stack(XMaterial.YELLOW_DYE), SlimefunItems.SILICON.item()})
                 .register(plugin);
 
-        MinecraftVersion minecraftVersion = Slimefun.getMinecraftVersion();
-
         new SlimefunItem(itemGroups.magicalArmor, SlimefunItems.BEE_HELMET, RecipeType.ARMOR_FORGE,
                 new ItemStack[] {SlimefunItems.GOLD_8K.item(), MaterialCompat.stack(XMaterial.HONEY_BLOCK), SlimefunItems.GOLD_8K.item(), MaterialCompat.stack(XMaterial.HONEYCOMB_BLOCK), null, MaterialCompat.stack(XMaterial.HONEYCOMB_BLOCK), null, null, null})
                 .register(plugin);
@@ -2674,11 +2668,9 @@ public final class SlimefunItemSetup {
                 new ItemStack[] {null, null, null, null, CustomItemStack.create(HeadTexture.PIGLIN_HEAD.getAsItemStack(), "&fPiglin"), null, null, null, null})
                 .register(plugin);
 
-        if (minecraftVersion.isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {
-            new Juice(itemGroups.food, SlimefunItems.GLOW_BERRY_JUICE, RecipeType.JUICER,
-                    new ItemStack[] {MaterialCompat.stack(XMaterial.GLOW_BERRIES), null, null, null, null, null, null, null, null})
-                    .register(plugin);
-        }
+        new Juice(itemGroups.food, SlimefunItems.GLOW_BERRY_JUICE, RecipeType.JUICER,
+                new ItemStack[] {MaterialCompat.stack(XMaterial.GLOW_BERRIES), null, null, null, null, null, null, null, null})
+                .register(plugin);
 
         new ElytraCap(itemGroups.magicalArmor, SlimefunItems.ELYTRA_CAP, RecipeType.ARMOR_FORGE,
                 new ItemStack[] {new ItemStack(Material.SLIME_BALL), new ItemStack(Material.SLIME_BALL), new ItemStack(Material.SLIME_BALL), SlimefunItems.ELYTRA_SCALE.item(), SlimefunItems.ELYTRA_SCALE.item(), SlimefunItems.ELYTRA_SCALE.item(), new ItemStack(Material.SLIME_BALL), new ItemStack(Material.LEATHER_HELMET), new ItemStack(Material.SLIME_BALL)})
