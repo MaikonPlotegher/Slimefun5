@@ -254,6 +254,10 @@ public final class ChestMenuUtils {
      */
     public static void updateStatus(@Nonnull BlockMenu menu, int slot, @Nonnull ItemStack statusItem) {
         if (menu.hasViewer()) {
+            ItemStack current = menu.getItemInSlot(slot);
+            if (current != null && current.isSimilar(statusItem)) {
+                return;
+            }
             menu.replaceExistingItem(slot, statusItem);
         }
     }
@@ -264,6 +268,10 @@ public final class ChestMenuUtils {
     public static void updateStatus(@Nonnull ChestMenu menu, int slot, @Nonnull ItemStack statusItem) {
         Inventory inv = menu.toInventory();
         if (inv != null && !inv.getViewers().isEmpty()) {
+            ItemStack current = inv.getItem(slot);
+            if (current != null && current.isSimilar(statusItem)) {
+                return;
+            }
             menu.replaceExistingItem(slot, statusItem);
         }
     }

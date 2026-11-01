@@ -27,7 +27,7 @@ import io.github.thebusybiscuit.slimefun5.utils.compatibility.MaterialCompat;
 public enum MachineStatus {
 
     /** Machine is idle / waiting for input ingredients or recipe match. */
-    IDLE("&6Aguardando Ingredientes...", XMaterial.YELLOW_STAINED_GLASS_PANE),
+    IDLE("&7Aguardando Ingredientes...", XMaterial.BLACK_STAINED_GLASS_PANE),
 
     /** Machine is currently processing / running. */
     PROCESSING("&aProcessando...", XMaterial.LIME_STAINED_GLASS_PANE),

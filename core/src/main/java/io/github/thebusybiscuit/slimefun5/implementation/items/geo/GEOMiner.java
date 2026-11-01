@@ -30,6 +30,7 @@ import io.github.thebusybiscuit.slimefun5.core.attributes.RecipeDisplayItem;
 import io.github.thebusybiscuit.slimefun5.core.handlers.BlockBreakHandler;
 import io.github.thebusybiscuit.slimefun5.core.handlers.BlockPlaceHandler;
 import io.github.thebusybiscuit.slimefun5.core.machines.MachineProcessor;
+import io.github.thebusybiscuit.slimefun5.core.machines.MachineStatus;
 import io.github.thebusybiscuit.slimefun5.core.networks.energy.EnergyNetComponentType;
 import io.github.thebusybiscuit.slimefun5.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun5.implementation.handlers.SimpleBlockBreakHandler;
@@ -259,7 +260,7 @@ public class GEOMiner extends SlimefunItem implements RecipeDisplayItem, EnergyN
             preset.addItem(i, ChestMenuUtils.getOutputSlotTexture(), ChestMenuUtils.getEmptyClickHandler());
         }
 
-        preset.addItem(4, CustomItemStack.create(XMaterial.BLACK_STAINED_GLASS_PANE.parseMaterial(), " "), ChestMenuUtils.getEmptyClickHandler());
+        preset.addItem(4, MachineStatus.IDLE.getItem(), ChestMenuUtils.getEmptyClickHandler());
 
         for (int i : OUTPUT_SLOTS) {
             preset.addMenuClickHandler(i, ChestMenuUtils.getDefaultOutputHandler());
@@ -291,13 +292,14 @@ public class GEOMiner extends SlimefunItem implements RecipeDisplayItem, EnergyN
                 processor.updateProgressBar(inv, 4, operation);
 
                 if (getCharge(b.getLocation()) < getEnergyConsumption()) {
+                    ChestMenuUtils.updateStatus(inv, 4, ChestMenuUtils.getNotEnoughEnergyStatus(getCharge(b.getLocation()), getEnergyConsumption()));
                     return;
                 }
 
                 removeCharge(b.getLocation(), getEnergyConsumption());
                 operation.addProgress(getSpeed());
             } else {
-                inv.replaceExistingItem(4, CustomItemStack.create(XMaterial.BLACK_STAINED_GLASS_PANE.parseMaterial(), " "));
+                ChestMenuUtils.updateStatus(inv, 4, MachineStatus.IDLE.getItem());
                 inv.pushItem(operation.getResult(), OUTPUT_SLOTS);
 
                 processor.endOperation(b);

@@ -25,6 +25,7 @@ import io.github.thebusybiscuit.slimefun5.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun5.core.attributes.MachineProcessHolder;
 import io.github.thebusybiscuit.slimefun5.core.handlers.BlockBreakHandler;
 import io.github.thebusybiscuit.slimefun5.core.machines.MachineProcessor;
+import io.github.thebusybiscuit.slimefun5.core.machines.MachineStatus;
 import io.github.thebusybiscuit.slimefun5.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun5.integrations.Protections;
 import io.github.thebusybiscuit.slimefun5.implementation.SlimefunItems;
@@ -125,7 +126,7 @@ public abstract class AGenerator extends AbstractEnergyProvider implements Machi
             preset.addMenuClickHandler(i, ChestMenuUtils.getDefaultOutputHandler());
         }
 
-        preset.addItem(22, CustomItemStack.create(XMaterial.BLACK_STAINED_GLASS_PANE.parseMaterial(), " "), ChestMenuUtils.getEmptyClickHandler());
+        preset.addItem(22, MachineStatus.NO_FUEL.getItem(), ChestMenuUtils.getEmptyClickHandler());
     }
 
     @Override
@@ -167,7 +168,7 @@ public abstract class AGenerator extends AbstractEnergyProvider implements Machi
                     inv.pushItem(new ItemStack(Material.BUCKET), getOutputSlots());
                 }
 
-                inv.replaceExistingItem(22, CustomItemStack.create(XMaterial.BLACK_STAINED_GLASS_PANE.parseMaterial(), " "));
+                ChestMenuUtils.updateStatus(inv, 22, MachineStatus.NO_FUEL.getItem());
 
                 processor.endOperation(l);
                 return 0;
@@ -181,7 +182,11 @@ public abstract class AGenerator extends AbstractEnergyProvider implements Machi
                     inv.consumeItem(entry.getKey(), entry.getValue());
                 }
 
-                processor.startOperation(l, new FuelOperation(fuel));
+                FuelOperation op = new FuelOperation(fuel);
+                processor.startOperation(l, op);
+                processor.updateProgressBar(inv, 22, op);
+            } else {
+                ChestMenuUtils.updateStatus(inv, 22, MachineStatus.NO_FUEL.getItem());
             }
 
             return 0;

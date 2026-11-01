@@ -29,6 +29,7 @@ import io.github.thebusybiscuit.slimefun5.core.attributes.EnergyNetComponent;
 import io.github.thebusybiscuit.slimefun5.core.attributes.MachineProcessHolder;
 import io.github.thebusybiscuit.slimefun5.core.handlers.BlockBreakHandler;
 import io.github.thebusybiscuit.slimefun5.core.machines.MachineProcessor;
+import io.github.thebusybiscuit.slimefun5.core.machines.MachineStatus;
 import io.github.thebusybiscuit.slimefun5.core.networks.energy.EnergyNetComponentType;
 import io.github.thebusybiscuit.slimefun5.implementation.handlers.SimpleBlockBreakHandler;
 import io.github.thebusybiscuit.slimefun5.implementation.operations.CraftingOperation;
@@ -110,7 +111,7 @@ public abstract class AContainer extends SlimefunItem implements InventoryBlock,
             preset.addItem(i, ChestMenuUtils.getOutputSlotTexture(), ChestMenuUtils.getEmptyClickHandler());
         }
 
-        preset.addItem(22, CustomItemStack.create(XMaterial.BLACK_STAINED_GLASS_PANE.parseMaterial(), " "), ChestMenuUtils.getEmptyClickHandler());
+        preset.addItem(22, MachineStatus.IDLE.getItem(), ChestMenuUtils.getEmptyClickHandler());
 
         for (int i : getOutputSlots()) {
             preset.addMenuClickHandler(i, ChestMenuUtils.getDefaultOutputHandler());
@@ -362,7 +363,7 @@ public abstract class AContainer extends SlimefunItem implements InventoryBlock,
                     processor.updateProgressBar(inv, 22, currentOperation);
                     currentOperation.addProgress(1);
                 } else {
-                    inv.replaceExistingItem(22, CustomItemStack.create(XMaterial.BLACK_STAINED_GLASS_PANE.parseMaterial(), " "));
+                    ChestMenuUtils.updateStatus(inv, 22, MachineStatus.IDLE.getItem());
 
                     for (ItemStack output : currentOperation.getResults()) {
                         inv.pushItem(output.clone(), getOutputSlots());
@@ -370,6 +371,8 @@ public abstract class AContainer extends SlimefunItem implements InventoryBlock,
 
                     processor.endOperation(b);
                 }
+            } else {
+                ChestMenuUtils.updateStatus(inv, 22, ChestMenuUtils.getNotEnoughEnergyStatus(getCharge(b.getLocation()), getEnergyConsumption()));
             }
         } else {
             MachineRecipe next = findNextRecipe(inv);
@@ -380,8 +383,19 @@ public abstract class AContainer extends SlimefunItem implements InventoryBlock,
 
                 // Fixes #3534 - Update indicator immediately
                 processor.updateProgressBar(inv, 22, currentOperation);
+            } else if (isInputEmpty(inv)) {
+                ChestMenuUtils.updateStatus(inv, 22, MachineStatus.IDLE.getItem());
             }
         }
+    }
+
+    private boolean isInputEmpty(@Nonnull BlockMenu inv) {
+        for (int slot : getInputSlots()) {
+            if (inv.getItemInSlot(slot) != null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -433,6 +447,7 @@ public abstract class AContainer extends SlimefunItem implements InventoryBlock,
 
             if (found.size() == recipe.getInput().length) {
                 if (!InvUtils.fitAll(inv.toInventory(), recipe.getOutput(), getOutputSlots())) {
+                    ChestMenuUtils.updateStatus(inv, 22, MachineStatus.OUTPUT_FULL.getItem());
                     return null;
                 }
 

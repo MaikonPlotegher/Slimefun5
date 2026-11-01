@@ -30,6 +30,7 @@ import io.github.thebusybiscuit.slimefun5.core.attributes.HologramOwner;
 import io.github.thebusybiscuit.slimefun5.core.attributes.MachineProcessHolder;
 import io.github.thebusybiscuit.slimefun5.core.handlers.BlockBreakHandler;
 import io.github.thebusybiscuit.slimefun5.core.machines.MachineProcessor;
+import io.github.thebusybiscuit.slimefun5.core.machines.MachineStatus;
 import io.github.thebusybiscuit.slimefun5.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun5.integrations.Protections;
 import io.github.thebusybiscuit.slimefun5.implementation.SlimefunItems;
@@ -203,7 +204,7 @@ public abstract class Reactor extends AbstractEnergyProvider implements Hologram
             preset.addItem(i, CustomItemStack.create(XMaterial.GREEN_STAINED_GLASS_PANE.parseMaterial(), " "), ChestMenuUtils.getEmptyClickHandler());
         }
 
-        preset.addItem(22, CustomItemStack.create(XMaterial.BLACK_STAINED_GLASS_PANE.parseMaterial(), " "), ChestMenuUtils.getEmptyClickHandler());
+        preset.addItem(22, MachineStatus.IDLE.getItem(), ChestMenuUtils.getEmptyClickHandler());
 
         preset.addItem(1, ChestMenuUtils.stripTranslationIdentity(CustomItemStack.create(getFuelIcon(), "&7Fuel Slot", "", "&fThis Slot accepts radioactive Fuel such as:", "&2Uranium &for &aNeptunium")), ChestMenuUtils.getEmptyClickHandler());
 
@@ -385,7 +386,7 @@ public abstract class Reactor extends AbstractEnergyProvider implements Hologram
     }
 
     private void createByproduct(@Nonnull Location l, @Nonnull BlockMenu inv, @Nullable BlockMenu accessPort, @Nonnull FuelOperation operation) {
-        inv.replaceExistingItem(22, CustomItemStack.create(XMaterial.BLACK_STAINED_GLASS_PANE.parseMaterial(), " "));
+        ChestMenuUtils.updateStatus(inv, 22, MachineStatus.IDLE.getItem());
         ItemStack result = operation.getResult();
 
         if (result != null) {
