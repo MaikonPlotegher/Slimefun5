@@ -140,25 +140,6 @@ dependencies {
     }
 }
 
-// 1.8.8 declares InventoryView.getTitle final, so the 1.14-1.20.6 subclass compiles against a never-shipped 1.14 stub.
-val inventoryViewStub: SourceSet = sourceSets.create("inventoryViewStub")
-val titledInventoryView: SourceSet = sourceSets.create("titledInventoryView")
-
-dependencies {
-    "inventoryViewStubCompileOnly"("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT") {
-        isTransitive = false
-    }
-}
-
-tasks.named<JavaCompile>(inventoryViewStub.compileJavaTaskName) {
-    options.encoding = "UTF-8"
-}
-
-tasks.named<JavaCompile>(titledInventoryView.compileJavaTaskName) {
-    options.encoding = "UTF-8"
-    classpath = inventoryViewStub.output + sourceSets.main.get().output + configurations.compileClasspath.get()
-}
-
 // Tests deliberately do NOT extend compileOnly: main compiles against spigot-api 1.8.8 + the stubs, but
 // the tests run on MockBukkit's real Paper 26.1.2 API, so pulling 1.8.8 + stubs onto the test classpath
 // would collide with MockBukkit's org.bukkit classes.
@@ -512,7 +493,6 @@ tasks {
         from(rootProject.projectDir) {
             include("LICENSE")
         }
-        from(titledInventoryView.output)
 
         // XSeries 9.10.0's regex "MC: \d\.(\d+)" can't parse a 26.x major; binary-patch the relocated
         // XMaterial$Data constant to "MC: (?:1\.)?(\d+)" (a newer XSeries would need Java 11+).
