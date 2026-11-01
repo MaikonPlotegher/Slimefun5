@@ -145,7 +145,6 @@ public class BlockListener implements Listener {
                     // (androids, hologram projectors), so /sf owner can answer for any placed machine -
                     // including bespoke addon multiblocks that are not a registered MultiBlock.
                     BlockStorage.addBlockInfo(block, "owner", player.getUniqueId().toString(), true);
-                    clearInheritedCustomName(block);
                     sfItem.callItemHandler(BlockPlaceHandler.class, handler -> handler.onPlayerPlace(e));
                 }
             }
@@ -165,23 +164,6 @@ public class BlockListener implements Listener {
     private void discardOrphanedInventory(Block block) {
         if (!BlockStorage.hasBlockInfo(block)) {
             Slimefun.getBlockStorageBackend().deleteInventory(block.getLocation());
-        }
-    }
-
-    /**
-     * Vanilla copies a placed item's display name onto the new block entity's {@code CustomName} (how a
-     * renamed chest keeps its name), but Slimefun bakes a physical display name into every item, which
-     * would otherwise freeze a {@link Nameable} container's GUI title in one language for every viewer.
-     * Runs before any {@link BlockPlaceHandler}, so a handler that wants its own name can still set one.
-     */
-    @ParametersAreNonnullByDefault
-    private void clearInheritedCustomName(Block block) {
-        BlockStateSnapshotResult result = PaperLib.getBlockState(block, false);
-        BlockState state = result.getState();
-
-        if (NameableCompat.isNameable(state) && ((Nameable) state).getCustomName() != null) {
-            ((Nameable) state).setCustomName(null);
-            state.update(true, false);
         }
     }
 

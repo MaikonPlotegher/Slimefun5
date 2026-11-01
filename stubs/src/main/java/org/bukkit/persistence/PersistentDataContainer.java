@@ -18,4 +18,6 @@ public interface PersistentDataContainer {
     <T, Z> Z getOrDefault(NamespacedKey key, PersistentDataType<T, Z> type, Z defaultValue);
 
     void remove(NamespacedKey key);
+
+    java.util.Set<NamespacedKey> getKeys();
 }

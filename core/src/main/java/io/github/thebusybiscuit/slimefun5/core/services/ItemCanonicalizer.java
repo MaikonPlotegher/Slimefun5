@@ -91,7 +91,12 @@ public final class ItemCanonicalizer {
             return false;
         }
 
-        // 9. Check if it matches the current template:
+        // 9. ONLY migrate if the item's current display name is the raw ID (legacy NMS format):
+        String currentName = meta.hasDisplayName() ? meta.getDisplayName() : null;
+        if (!id.equals(currentName)) {
+            return false;
+        }
+
         ItemMeta templateMeta = sfItem.getItem().getItemMeta();
         if (templateMeta == null) {
             return false;
@@ -99,13 +104,6 @@ public final class ItemCanonicalizer {
 
         String targetName = templateMeta.hasDisplayName() ? templateMeta.getDisplayName() : null;
         java.util.List<String> targetLore = templateMeta.hasLore() ? templateMeta.getLore() : null;
-
-        boolean nameMatches = java.util.Objects.equals(meta.getDisplayName(), targetName);
-        boolean loreMatches = java.util.Objects.equals(meta.getLore(), targetLore);
-
-        if (nameMatches && loreMatches) {
-            return false; // Already matches template!
-        }
 
         // Apply updated name and lore from template
         meta.setDisplayName(targetName);
@@ -118,21 +116,14 @@ public final class ItemCanonicalizer {
     }
 
     private static boolean hasUnknownPdcKeys(@Nonnull ItemMeta meta) {
-        try {
-            Object container = ReflectionCompat.invoke(meta, "getPersistentDataContainer");
-            if (container != null) {
-                Method getKeys = container.getClass().getMethod("getKeys");
-                @SuppressWarnings("unchecked")
-                Set<Object> keys = (Set<Object>) getKeys.invoke(container);
-                for (Object k : keys) {
-                    String str = k.toString();
-                    if (!str.equals("slimefun:slimefun_item") && !str.equals("slimefun:shown_original")) {
-                        return true;
-                    }
+        if (meta instanceof org.bukkit.persistence.PersistentDataHolder) {
+            org.bukkit.persistence.PersistentDataContainer container = ((org.bukkit.persistence.PersistentDataHolder) meta).getPersistentDataContainer();
+            for (org.bukkit.NamespacedKey key : container.getKeys()) {
+                String str = key.toString();
+                if (!str.equals("slimefun:slimefun_item") && !str.equals("slimefun:shown_original")) {
+                    return true;
                 }
             }
-        } catch (Throwable ignored) {
-            // Pre-1.14
         }
         return false;
     }

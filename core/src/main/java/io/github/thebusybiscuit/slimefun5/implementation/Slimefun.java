@@ -129,7 +129,6 @@ import io.github.thebusybiscuit.slimefun5.core.guide.wiki.WikiPage;
 import io.github.thebusybiscuit.slimefun5.core.guide.wiki.WikiText;
 import io.github.thebusybiscuit.slimefun5.implementation.listeners.TalismanBlockDropListener;
 import io.github.thebusybiscuit.slimefun5.implementation.listeners.TalismanListener;
-import io.github.thebusybiscuit.slimefun5.implementation.listeners.VanillaContainerTitleListener;
 import io.github.thebusybiscuit.slimefun5.implementation.listeners.VillagerTradingListener;
 import io.github.thebusybiscuit.slimefun5.implementation.listeners.crafting.AnvilListener;
 import io.github.thebusybiscuit.slimefun5.implementation.listeners.crafting.AnvilRenameListener;
@@ -868,7 +867,6 @@ public class Slimefun extends JavaPlugin implements SlimefunAddon {
         register(() -> new GadgetsListener(this));
         register(() -> new DispenserListener(this));
         register(() -> new BlockListener(this));
-        register(() -> new VanillaContainerTitleListener(this));
         register(() -> new EnhancedFurnaceListener(this));
         register(() -> new ItemPickupListener(this));
         register(() -> new ItemDropListener(this));

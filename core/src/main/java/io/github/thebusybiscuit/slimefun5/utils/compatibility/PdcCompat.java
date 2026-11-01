@@ -7,6 +7,10 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataHolder;
+import org.bukkit.persistence.PersistentDataType;
+
 import io.github.thebusybiscuit.slimefun5.libraries.keys.NamespacedKey;
 
 /**
@@ -46,14 +50,33 @@ public final class PdcCompat {
     public static void forgetMemory() {}
 
     @Nullable
-    private static Object container(Object holder) {
-        return ReflectionCompat.invoke(holder, "getPersistentDataContainer");
+    private static PersistentDataContainer container(Object holder) {
+        if (holder instanceof PersistentDataHolder) {
+            return ((PersistentDataHolder) holder).getPersistentDataContainer();
+        }
+        Object result = ReflectionCompat.invoke(holder, "getPersistentDataContainer");
+        return result instanceof PersistentDataContainer ? (PersistentDataContainer) result : null;
     }
 
     @Nullable
-    private static Object dataType(String typeName) {
-        Object resolved = DATA_TYPES.computeIfAbsent(typeName, PdcCompat::resolveDataType);
-        return resolved == UNAVAILABLE ? null : resolved;
+    @SuppressWarnings("unchecked")
+    private static <T, Z> PersistentDataType<T, Z> dataType(String typeName) {
+        if (typeName == null) {
+            return null;
+        }
+        switch (typeName) {
+            case "STRING": return (PersistentDataType<T, Z>) PersistentDataType.STRING;
+            case "BYTE": return (PersistentDataType<T, Z>) PersistentDataType.BYTE;
+            case "SHORT": return (PersistentDataType<T, Z>) PersistentDataType.SHORT;
+            case "INTEGER": return (PersistentDataType<T, Z>) PersistentDataType.INTEGER;
+            case "LONG": return (PersistentDataType<T, Z>) PersistentDataType.LONG;
+            case "FLOAT": return (PersistentDataType<T, Z>) PersistentDataType.FLOAT;
+            case "DOUBLE": return (PersistentDataType<T, Z>) PersistentDataType.DOUBLE;
+            case "BYTE_ARRAY": return (PersistentDataType<T, Z>) PersistentDataType.BYTE_ARRAY;
+            default:
+                Object resolved = DATA_TYPES.computeIfAbsent(typeName, PdcCompat::resolveDataType);
+                return resolved instanceof PersistentDataType ? (PersistentDataType<T, Z>) resolved : null;
+        }
     }
 
     private static Object resolveDataType(String typeName) {
@@ -69,24 +92,26 @@ public final class PdcCompat {
         }
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static void set(Object holder, NamespacedKey key, String typeName, Object value) {
-        Object c = container(holder);
-        Object t = dataType(typeName);
-        Object k = BukkitKeys.toBukkit(key);
+        PersistentDataContainer c = container(holder);
+        PersistentDataType t = dataType(typeName);
+        org.bukkit.NamespacedKey k = (org.bukkit.NamespacedKey) BukkitKeys.toBukkit(key);
 
         if (c != null && t != null && k != null) {
-            ReflectionCompat.invoke(c, "set", k, t, value);
+            c.set(k, t, value);
         }
     }
 
     @Nullable
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static Object get(Object holder, NamespacedKey key, String typeName) {
-        Object c = container(holder);
-        Object t = dataType(typeName);
-        Object k = BukkitKeys.toBukkit(key);
+        PersistentDataContainer c = container(holder);
+        PersistentDataType t = dataType(typeName);
+        org.bukkit.NamespacedKey k = (org.bukkit.NamespacedKey) BukkitKeys.toBukkit(key);
 
         if (c != null && t != null && k != null) {
-            return ReflectionCompat.invoke(c, "get", k, t);
+            return c.get(k, t);
         }
 
         return null;
@@ -97,13 +122,14 @@ public final class PdcCompat {
         return value != null ? value : defaultValue;
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static boolean has(Object holder, NamespacedKey key, String typeName) {
-        Object c = container(holder);
-        Object t = dataType(typeName);
-        Object k = BukkitKeys.toBukkit(key);
+        PersistentDataContainer c = container(holder);
+        PersistentDataType t = dataType(typeName);
+        org.bukkit.NamespacedKey k = (org.bukkit.NamespacedKey) BukkitKeys.toBukkit(key);
 
         if (c != null && t != null && k != null) {
-            return Boolean.TRUE.equals(ReflectionCompat.invoke(c, "has", k, t));
+            return c.has(k, t);
         }
 
         return false;
@@ -113,8 +139,8 @@ public final class PdcCompat {
      * Version-safe equality of two holders' PersistentDataContainers.
      */
     public static boolean containersEqual(Object holderA, Object holderB) {
-        Object a = container(holderA);
-        Object b = container(holderB);
+        PersistentDataContainer a = container(holderA);
+        PersistentDataContainer b = container(holderB);
 
         if (a == null || b == null) {
             return a == b;
@@ -124,11 +150,11 @@ public final class PdcCompat {
     }
 
     public static void remove(Object holder, NamespacedKey key) {
-        Object c = container(holder);
-        Object k = BukkitKeys.toBukkit(key);
+        PersistentDataContainer c = container(holder);
+        org.bukkit.NamespacedKey k = (org.bukkit.NamespacedKey) BukkitKeys.toBukkit(key);
 
         if (c != null && k != null) {
-            ReflectionCompat.invoke(c, "remove", k);
+            c.remove(k);
         }
     }
 
