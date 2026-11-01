@@ -592,4 +592,30 @@ O addon **ElectricSpawners** foi atualizado e modernizado para compilar diretame
 4. **Deploy:**
    - Compilado com sucesso gerando `ElectricSpawners-v1.0.jar` e copiado para a pasta de plugins do servidor (`servidor_26.1.2/plugins/ElectricSpawners-v1.0.jar`).
 
+---
+
+## 20. Migração do Addon MobCapturer para Slimefun5 (v1.0)
+
+### 20.1 O Que Mudou no MobCapturer
+O addon **MobCapturer** (canhão de captura de mobs e ovos de spawn gerados dinamicamente) foi completamente atualizado para compilar contra o fork **`com.github.MaikonPlotegher:Slimefun5:v1.0`** em ambiente moderno Paper 1.21.x e Java 25.
+
+### 20.2 Principais Ajustes Realizados:
+1. **Atualização do Gradle e Java:**
+   - O Gradle Wrapper legado (8.5) causava incompatibilidade imediata com o JDK 25 (`java.lang.IllegalArgumentException: 25.0.3`). Foi atualizado para o **Gradle 9.3.1**.
+   - `build.gradle.kts` configurado para `compileOnly("com.github.MaikonPlotegher:Slimefun5:v1.0")`, `compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")` e versão `v1.0`.
+2. **Remoção de Dependências Externas Quebradas (`guizhanlib`):**
+   - O plugin dependia de `net.guizhanss:guizhanlib-all:2.2.0-SNAPSHOT` via JitPack, que falhava no build com erro HTTP 401 Unauthorized.
+   - A dependência foi completamente eliminada. Criou-se internamente as classes de utilidade [`MinecraftVersionUtil.java`](file:///c:/Users/maiko/OneDrive/Documents/slimefun5%20addons/em%20andamento/MobCapturer/src/main/java/io/github/thebusybiscuit/mobcapturer/utils/compatibility/MinecraftVersionUtil.java) e [`EntityTypeX.java`](file:///c:/Users/maiko/OneDrive/Documents/slimefun5%20addons/em%20andamento/MobCapturer/src/main/java/io/github/thebusybiscuit/mobcapturer/utils/compatibility/EntityTypeX.java) em `mobcapturer.utils.compatibility`, tornando o projeto 100% autônomo.
+3. **Remoção do Lombok (Incompatibilidade com Java 25):**
+   - O Lombok acessava estruturas internas do compilador `javac` (`com.sun.tools.javac.code.TypeTag::UNKNOWN`), gerando `ExceptionInInitializerError` no Java 25.
+   - O Lombok foi removido de `build.gradle.kts` e as anotações `@UtilityClass` e `@Getter` foram substituídas por construtores privados e métodos getters nativos em todas as 14 classes utilitárias.
+4. **Padronização para Slimefun5:**
+   - Todos os imports migrados de `io.github.thebusybiscuit.slimefun4.*` para `slimefun5.*`.
+   - `CustomItemStack` adaptado para o padrão estático `CustomItemStack.create(...)`.
+   - Itens de receita (`MAGIC_LUMP_2`, `STEEL_INGOT`, `HOOK`, etc.) adaptados com `.item()`.
+   - `NamespacedKey` migrado para a chave nativa do Slimefun5 (`io.github.thebusybiscuit.slimefun5.libraries.keys.NamespacedKey`).
+5. **Deploy:**
+   - Compilado com sucesso via Gradle gerando `MobCapturer-v1.0.jar` e copiado para a pasta de plugins do servidor (`servidor_26.1.2/plugins/MobCapturer-v1.0.jar`).
+
+
 
