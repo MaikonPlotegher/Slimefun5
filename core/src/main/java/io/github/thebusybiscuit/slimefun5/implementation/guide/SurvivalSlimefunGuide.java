@@ -335,11 +335,9 @@ public class SurvivalSlimefunGuide implements SlimefunGuideImplementation {
             return;
         }
 
-        if (isSurvivalMode()) {
-            GuideHistory history = profile.getGuideHistory();
-            history.clear();
-            history.setMainMenuPage(page);
-        }
+        GuideHistory history = profile.getGuideHistory();
+        history.clear();
+        history.setMainMenuPage(page);
 
         ChestMenu menu = create(p);
 
@@ -700,9 +698,7 @@ public class SurvivalSlimefunGuide implements SlimefunGuideImplementation {
         // gap and short-changed the page.
         List<SlimefunItem> items = collapseForDisplay(p, itemGroup.getItems());
 
-        if (isSurvivalMode()) {
-            profile.getGuideHistory().add(itemGroup, page);
-        }
+        profile.getGuideHistory().add(itemGroup, page);
 
         ChestMenu menu = create(p);
         createHeader(p, profile, menu);
@@ -1457,7 +1453,7 @@ public class SurvivalSlimefunGuide implements SlimefunGuideImplementation {
     private void addBackButton(ChestMenu menu, int slot, Player p, PlayerProfile profile) {
         GuideHistory history = profile.getGuideHistory();
 
-        if (isSurvivalMode() && history.size() > 1) {
+        if (history.size() > 1) {
             menu.addItem(slot, ChestMenuUtils.getBackButton(p, Slimefun.getLocalization().getMessages(p, "guide.back.page").toArray(new String[0])));
 
             menu.addMenuClickHandler(slot, (pl, s, is, action) -> {

@@ -33,7 +33,7 @@ class MainMenuLayoutOption implements SlimefunGuideOption<Boolean> {
 
     /** The server-configured default that a player who hasn't toggled the option inherits. */
     static boolean serverDefault() {
-        return Slimefun.getCfg().getOrSetDefault("guide.categorize-main-menu", true);
+        return Slimefun.getCfg().getOrSetDefault("guide.categorize-main-menu", false);
     }
 
     @Override

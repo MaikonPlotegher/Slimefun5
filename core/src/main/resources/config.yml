@@ -123,7 +123,7 @@ guide:
   # Default for grouping the guide's main menu into themes (the reworked layout). Set to false for the
   # classic flat main menu that lists every category directly. This is only the DEFAULT - each player can
   # override it in the guide's Settings panel ("Main Menu: Categorized/Classic"). Values: true | false
-  categorize-main-menu: true
+  categorize-main-menu: false
   # When false, guide buttons that open an external website outside the settings panel (item wiki
   # pages, contributor profiles, the addon list) are hidden. Leave true to keep them.
   external-links: true
