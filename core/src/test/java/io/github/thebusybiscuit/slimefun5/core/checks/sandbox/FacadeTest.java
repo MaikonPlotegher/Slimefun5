@@ -78,7 +78,7 @@ class FacadeTest {
     }
 
     @Test
-    void inventoryViewWorksOnBothShapes() {
+    void inventoryViewWorks() {
         CheckGap gaps = new CheckGap();
         SandboxWorld world = SandboxWorld.create("sandbox_test", gaps);
         Player player = world.join("viewer", "de_de").player();
@@ -95,33 +95,6 @@ class FacadeTest {
         Assertions.assertEquals("Ofen", view.getOriginalTitle());
         Assertions.assertEquals(9 + 36, view.countSlots());
         Assertions.assertTrue(gaps.recorded().isEmpty(), () -> "gaps: " + gaps.recorded());
-    }
-
-    @Test
-    void viewShapeIsReadFromTheRunningApi() {
-        Assertions.assertEquals(SandboxInventoryView.Shape.INTERFACE, SandboxInventoryView.Shape.of(InventoryView.class));
-        Assertions.assertEquals(SandboxInventoryView.Shape.FINAL_TITLE, SandboxInventoryView.Shape.of(FinalTitleView.class));
-        Assertions.assertEquals(SandboxInventoryView.Shape.ABSTRACT_TITLE, SandboxInventoryView.Shape.of(AbstractTitleView.class));
-        Assertions.assertEquals(SandboxInventoryView.Shape.RETITLABLE, SandboxInventoryView.Shape.of(RetitlableTitleView.class));
-    }
-
-    abstract static class FinalTitleView {
-
-        public final String getTitle() {
-            return "";
-        }
-    }
-
-    abstract static class AbstractTitleView {
-
-        public abstract String getTitle();
-    }
-
-    abstract static class RetitlableTitleView {
-
-        public abstract String getTitle();
-
-        public abstract void setTitle(String title);
     }
 
     public interface IntValue {

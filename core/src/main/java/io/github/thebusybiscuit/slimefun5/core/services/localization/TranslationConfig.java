@@ -26,7 +26,7 @@ public final class TranslationConfig {
     }
 
     public static boolean packetsEnabled() {
-        return Slimefun.getCfg().contains("translation.packets") && Slimefun.getCfg().getBoolean("translation.packets");
+        return false;
     }
 
     public static FallbackMode fallback() {

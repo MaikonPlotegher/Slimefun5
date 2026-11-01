@@ -243,19 +243,6 @@ metrics:
   # Values: true | false
   disable-addon-metrics: true
 
-translation:
-  # Rewrite item name/lore per viewer via packets so each player sees their own language.
-  # Values: true | false
-  packets: false
-  # What a missing translation label falls back to: 'english' or 'id' (the raw Slimefun id).
-  # Values: english | id
-  fallback: english
-  # For players who haven't picked a Slimefun language in the guide:
-  # 'client' = use their Minecraft client language when it's installed, else the server default.
-  # 'server' = always use the server's default language (options.language above).
-  # Values: client | server
-  language-source: client
-
 # Ordered list of research rank titles, from lowest to highest. A player's title is chosen by the
 # percentage of all researches they've unlocked: the list is split evenly across 0%-100%, so the first
 # entry is shown at 0 researches and the last at 100%. Edit/reorder freely, but the list must not be empty.
