@@ -41,14 +41,15 @@ class FixCommand extends SubCommand {
         for (int i = 0; i < contents.length; i++) {
             ItemStack stack = contents[i];
             if (stack != null && ItemCanonicalizer.canonicalize(stack)) {
-                contents[i] = stack;
+                player.getInventory().setItem(i, stack);
                 fixed++;
             }
         }
 
         if (fixed > 0) {
-            player.getInventory().setContents(contents);
             player.updateInventory();
+            io.github.thebusybiscuit.slimefun5.utils.compatibility.HandCompat.setMainHand(player, io.github.thebusybiscuit.slimefun5.utils.compatibility.HandCompat.getMainHand(player));
+            io.github.thebusybiscuit.slimefun5.utils.compatibility.HandCompat.setOffHand(player, io.github.thebusybiscuit.slimefun5.utils.compatibility.HandCompat.getOffHand(player));
         }
 
         sender.sendMessage(ChatColor.GREEN + "[Slimefun] " + fixed + " item(s) fixed.");

@@ -41,6 +41,7 @@ import io.github.thebusybiscuit.slimefun5.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun5.api.items.groups.FlexItemGroup;
 import io.github.thebusybiscuit.slimefun5.api.items.groups.NestedItemGroup;
+import io.github.thebusybiscuit.slimefun5.api.items.groups.SubItemGroup;
 import io.github.thebusybiscuit.slimefun5.api.items.groups.LockedItemGroup;
 import io.github.thebusybiscuit.slimefun5.api.player.PlayerProfile;
 import io.github.thebusybiscuit.slimefun5.api.recipes.RecipeType;
@@ -496,9 +497,7 @@ public class SurvivalSlimefunGuide implements SlimefunGuideImplementation {
             return;
         }
 
-        if (isSurvivalMode()) {
-            profile.getGuideHistory().add(categoryGroup, page);
-        }
+        profile.getGuideHistory().add(categoryGroup, page);
 
         ChestMenu menu = create(p);
         createHeader(p, profile, menu);
@@ -553,9 +552,7 @@ public class SurvivalSlimefunGuide implements SlimefunGuideImplementation {
 
         List<SlimefunItem> items = collapseForDisplay(p, categoryGroup.getAllItems());
 
-        if (isSurvivalMode()) {
-            profile.getGuideHistory().add(categoryGroup, page);
-        }
+        profile.getGuideHistory().add(categoryGroup, page);
 
         ChestMenu menu = create(p);
         createHeader(p, profile, menu);
@@ -703,7 +700,7 @@ public class SurvivalSlimefunGuide implements SlimefunGuideImplementation {
         ChestMenu menu = create(p);
         createHeader(p, profile, menu);
 
-        addBackButton(menu, 1, p, profile);
+        addBackButton(menu, 1, p, profile, itemGroup);
 
         int pages = (items.size() - 1) / MAX_ITEM_GROUPS + 1;
 
@@ -1451,6 +1448,10 @@ public class SurvivalSlimefunGuide implements SlimefunGuideImplementation {
     }
 
     private void addBackButton(ChestMenu menu, int slot, Player p, PlayerProfile profile) {
+        addBackButton(menu, slot, p, profile, null);
+    }
+
+    private void addBackButton(ChestMenu menu, int slot, Player p, PlayerProfile profile, @Nullable ItemGroup currentGroup) {
         GuideHistory history = profile.getGuideHistory();
 
         if (history.size() > 1) {
@@ -1464,7 +1465,18 @@ public class SurvivalSlimefunGuide implements SlimefunGuideImplementation {
                 }
                 return false;
             });
-
+        } else if (currentGroup instanceof SubItemGroup && ((SubItemGroup) currentGroup).getParent() != null) {
+            menu.addItem(slot, ChestMenuUtils.getBackButton(p, "", ChatColor.GRAY + Slimefun.getLocalization().getMessage(p, "guide.back.guide")));
+            menu.addMenuClickHandler(slot, (pl, s, is, action) -> {
+                ((SubItemGroup) currentGroup).getParent().open(pl, profile, getMode());
+                return false;
+            });
+        } else if (currentGroup instanceof NestedItemGroup && ((NestedItemGroup) currentGroup).getParent() != null) {
+            menu.addItem(slot, ChestMenuUtils.getBackButton(p, "", ChatColor.GRAY + Slimefun.getLocalization().getMessage(p, "guide.back.guide")));
+            menu.addMenuClickHandler(slot, (pl, s, is, action) -> {
+                ((NestedItemGroup) currentGroup).getParent().open(pl, profile, getMode());
+                return false;
+            });
         } else {
             menu.addItem(slot, ChestMenuUtils.getBackButton(p, "", ChatColor.GRAY + Slimefun.getLocalization().getMessage(p, "guide.back.guide")));
             menu.addMenuClickHandler(slot, (pl, s, is, action) -> {
