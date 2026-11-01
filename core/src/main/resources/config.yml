@@ -5,10 +5,13 @@ options:
   # Note: When running a stable build auto-updates ONLY update to other stable builds! Perfect eh?
   # You can download the latest stable build here: https://thebusybiscuit.github.io/builds/TheBusyBiscuit/Slimefun5/stable/
   # Values: true | false
-  auto-update: true
+  auto-update: false
   # bStats metrics module. Reports anonymous usage stats to this fork's own bStats project (id 31272).
   # On by default (standard bStats opt-out). Set to false to disable. Values: true | false
   metrics-service: true
+  # Whether to log warnings on startup when an item or addon inherits a deprecated class or interface.
+  # Defaults to false to keep the server startup console clean and readable. Values: true | false
+  warn-on-deprecated-classes: false
   # Prefix prepended to Slimefun's chat messages. Supports '&' colour/format codes.
   chat-prefix: '&a&lSlimefun 5&7> '
   # How often (in SECONDS) worn Slimefun armor effects are re-applied (also drives the Solar Helmet task).

@@ -708,6 +708,10 @@ public class SlimefunItem implements Placeable {
      *            The {@link Class} from which to start this operation.
      */
     private void checkForDeprecations(@Nullable Class<?> c) {
+        if (!Slimefun.getCfg().getBoolean("options.warn-on-deprecated-classes")) {
+            return;
+        }
+
         if (Slimefun.getUpdater().getBranch() == SlimefunBranch.DEVELOPMENT) {
             /*
              * This method is currently way too spammy with all the restructuring going on...
