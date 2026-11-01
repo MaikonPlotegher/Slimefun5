@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import org.bukkit.ChatColor;
@@ -26,6 +27,8 @@ import io.github.thebusybiscuit.slimefun5.utils.compatibility.VersionedItemFlag;
 
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuClickHandler;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import io.github.thebusybiscuit.slimefun5.core.machines.MachineStatus;
 
 public final class ChestMenuUtils {
 
@@ -206,6 +209,63 @@ public final class ChestMenuUtils {
         PdcCompat.remove(meta, Slimefun.getItemDataService().getKey());
         displayCopy.setItemMeta(meta);
         return displayCopy;
+    }
+
+    // --- Machine Status Helpers ---
+
+    @Nonnull
+    public static ItemStack getStatusItem(@Nonnull MachineStatus status) {
+        return status.getItem();
+    }
+
+    @Nonnull
+    public static ItemStack getStatusItem(@Nonnull MachineStatus status, @Nullable String... lore) {
+        return status.withLore(lore);
+    }
+
+    @Nonnull
+    public static ItemStack getNotEnoughEnergyStatus(int currentEnergy, int requiredEnergy) {
+        return MachineStatus.notEnoughEnergy(currentEnergy, requiredEnergy);
+    }
+
+    @Nonnull
+    public static ItemStack getProcessingStatus(int remainingTicks, int totalTicks) {
+        return MachineStatus.processing(remainingTicks, totalTicks);
+    }
+
+    @Nonnull
+    public static ItemStack getProcessingStatus(@Nullable ItemStack indicator, int remainingTicks, int totalTicks) {
+        return MachineStatus.processing(indicator, remainingTicks, totalTicks);
+    }
+
+    @Nonnull
+    public static ItemStack getProcessingStatus(float percentage) {
+        return MachineStatus.processing(percentage);
+    }
+
+    @Nonnull
+    public static ItemStack getProcessingStatus(@Nullable ItemStack indicator, float percentage) {
+        return MachineStatus.processing(indicator, percentage);
+    }
+
+    /**
+     * Safely updates a status slot in a {@link BlockMenu} only if players are actively viewing it,
+     * saving server tick resources when the machine menu is closed.
+     */
+    public static void updateStatus(@Nonnull BlockMenu menu, int slot, @Nonnull ItemStack statusItem) {
+        if (menu.hasViewer()) {
+            menu.replaceExistingItem(slot, statusItem);
+        }
+    }
+
+    /**
+     * Safely updates a status slot in a {@link ChestMenu} only if players are actively viewing it.
+     */
+    public static void updateStatus(@Nonnull ChestMenu menu, int slot, @Nonnull ItemStack statusItem) {
+        Inventory inv = menu.toInventory();
+        if (inv != null && !inv.getViewers().isEmpty()) {
+            menu.replaceExistingItem(slot, statusItem);
+        }
     }
 
 }
