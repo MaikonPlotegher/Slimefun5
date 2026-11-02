@@ -20,6 +20,7 @@ import io.github.thebusybiscuit.slimefun5.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun5.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun5.core.attributes.DistinctiveItem;
 import io.github.thebusybiscuit.slimefun5.utils.ChatUtils;
 
 /**
@@ -32,7 +33,7 @@ import io.github.thebusybiscuit.slimefun5.utils.ChatUtils;
  * @see RepairedSpawner
  *
  */
-public abstract class AbstractMonsterSpawner extends SlimefunItem {
+public abstract class AbstractMonsterSpawner extends SlimefunItem implements DistinctiveItem {
 
     @ParametersAreNonnullByDefault
     AbstractMonsterSpawner(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
@@ -57,8 +58,19 @@ public abstract class AbstractMonsterSpawner extends SlimefunItem {
     public Optional<EntityType> getEntityType(@Nonnull ItemStack item) {
         Validate.notNull(item, "The Item cannot be null");
 
-        ItemMeta meta = item.getItemMeta();
+        return getEntityType(item.getItemMeta());
+    }
 
+    /**
+     * This method tries to obtain an {@link EntityType} from a given {@link ItemMeta}.
+     *
+     * @param meta
+     *            The {@link ItemMeta} to extract the {@link EntityType} from
+     *
+     * @return An {@link Optional} describing the result
+     */
+    @Nonnull
+    public Optional<EntityType> getEntityType(@javax.annotation.Nullable ItemMeta meta) {
         if (meta == null) {
             return Optional.empty();
         }
@@ -79,13 +91,24 @@ public abstract class AbstractMonsterSpawner extends SlimefunItem {
         if (meta.hasLore()) {
             for (String line : meta.getLore()) {
                 if (ChatColor.stripColor(line).startsWith("Type: ") && !line.contains("<Type>")) {
-                    EntityType type = EntityType.valueOf(ChatColor.stripColor(line).replace("Type: ", "").replace(' ', '_').toUpperCase(Locale.ROOT));
-                    return Optional.of(type);
+                    try {
+                        EntityType type = EntityType.valueOf(ChatColor.stripColor(line).replace("Type: ", "").replace(' ', '_').toUpperCase(Locale.ROOT));
+                        return Optional.of(type);
+                    } catch (IllegalArgumentException ignored) {
+                        // ignore malformed entity names
+                    }
                 }
             }
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public boolean canStack(@Nonnull ItemMeta itemMetaOne, @Nonnull ItemMeta itemMetaTwo) {
+        Optional<EntityType> type1 = getEntityType(itemMetaOne);
+        Optional<EntityType> type2 = getEntityType(itemMetaTwo);
+        return type1.equals(type2);
     }
 
     /**
