@@ -91,9 +91,10 @@ public final class ItemCanonicalizer {
             return false;
         }
 
-        // 9. ONLY migrate if the item's current display name is the raw ID (legacy NMS format):
+        // 9. ONLY migrate if the item's current display name is missing or the raw ID (legacy NMS format):
         String currentName = meta.hasDisplayName() ? meta.getDisplayName() : null;
-        if (!id.equals(currentName)) {
+        boolean needsFix = currentName == null || id.equals(currentName);
+        if (!needsFix) {
             return false;
         }
 

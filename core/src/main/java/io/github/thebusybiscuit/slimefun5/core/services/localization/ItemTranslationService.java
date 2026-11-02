@@ -18,6 +18,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -28,8 +29,11 @@ import com.cryptomorin.xseries.XMaterial;
 
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun5.api.player.PlayerBackpack;
+import io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine;
 import io.github.thebusybiscuit.slimefun5.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun5.implementation.items.VanillaItem;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 
 /**
  * Translates Slimefun item names and lore per language. Translations live in
@@ -311,6 +315,66 @@ public class ItemTranslationService {
             } catch (Exception | LinkageError ignored) {
                 // a single broken item must not abort the pass
             }
+        }
+
+        // Synchronize recipes and drop tables with baked metadata
+        try {
+            if (Slimefun.getRegistry() != null) {
+                for (SlimefunItem item : Slimefun.getRegistry().getEnabledSlimefunItems()) {
+                    if (item instanceof MultiBlockMachine) {
+                        MultiBlockMachine mbm = (MultiBlockMachine) item;
+                        for (ItemStack[] recipeArr : mbm.getRecipes()) {
+                            if (recipeArr != null) {
+                                for (ItemStack stack : recipeArr) {
+                                    if (stack != null && stack.getType() != Material.AIR) {
+                                        SlimefunItem sf = SlimefunItem.getByItem(stack);
+                                        if (sf != null && sf.getItem().hasItemMeta()) {
+                                            stack.setItemMeta(sf.getItem().getItemMeta());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (item instanceof AContainer) {
+                        AContainer container = (AContainer) item;
+                        for (MachineRecipe recipe : container.getMachineRecipes()) {
+                            if (recipe != null && recipe.getOutput() != null) {
+                                for (ItemStack stack : recipe.getOutput()) {
+                                    if (stack != null && stack.getType() != Material.AIR) {
+                                        SlimefunItem sf = SlimefunItem.getByItem(stack);
+                                        if (sf != null && sf.getItem().hasItemMeta()) {
+                                            stack.setItemMeta(sf.getItem().getItemMeta());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                for (ItemStack stack : Slimefun.getRegistry().getBarteringDrops()) {
+                    if (stack != null && stack.getType() != Material.AIR) {
+                        SlimefunItem sf = SlimefunItem.getByItem(stack);
+                        if (sf != null && sf.getItem().hasItemMeta()) {
+                            stack.setItemMeta(sf.getItem().getItemMeta());
+                        }
+                    }
+                }
+                for (Set<ItemStack> drops : Slimefun.getRegistry().getMobDrops().values()) {
+                    if (drops != null) {
+                        for (ItemStack stack : drops) {
+                            if (stack != null && stack.getType() != Material.AIR) {
+                                SlimefunItem sf = SlimefunItem.getByItem(stack);
+                                if (sf != null && sf.getItem().hasItemMeta()) {
+                                    stack.setItemMeta(sf.getItem().getItemMeta());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception | LinkageError ignored) {
+            // Recipe sync error must not abort boot
         }
 
         try {

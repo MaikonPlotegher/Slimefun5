@@ -189,7 +189,7 @@ tasks {
 
                 if (!hasLegacyBlockCheck) {
                     val mv = cw.visitMethod(
-                        Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC,
+                        Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC or Opcodes.ACC_BRIDGE or Opcodes.ACC_SYNTHETIC,
                         "check",
                         "(Lorg/bukkit/block/Block;)Lio/github/thebusybiscuit/slimefun4/api/items/SlimefunItem;",
                         null,
@@ -218,7 +218,7 @@ tasks {
 
                 if (!hasLegacyLocCheck) {
                     val mv = cw.visitMethod(
-                        Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC,
+                        Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC or Opcodes.ACC_BRIDGE or Opcodes.ACC_SYNTHETIC,
                         "check",
                         "(Lorg/bukkit/Location;)Lio/github/thebusybiscuit/slimefun4/api/items/SlimefunItem;",
                         null,

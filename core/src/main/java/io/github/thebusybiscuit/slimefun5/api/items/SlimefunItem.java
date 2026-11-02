@@ -81,6 +81,11 @@ public class SlimefunItem implements Placeable {
     private final ItemStack itemStackTemplate;
 
     /**
+     * The {@link SlimefunItemStack} associated with this item, if registered via one.
+     */
+    private final SlimefunItemStack slimefunItemStack;
+
+    /**
      * This is a reference to the {@link SlimefunAddon} that registered this
      * {@link SlimefunItem}, if the item has not been registered yet, it will be null.
      */
@@ -163,6 +168,7 @@ public class SlimefunItem implements Placeable {
         Validate.notNull(recipeType, "'recipeType' is not allowed to be null!");
 
         this.itemGroup = itemGroup;
+        this.slimefunItemStack = item;
         this.itemStackTemplate = item.item();
         this.id = item.getItemId();
         this.recipeType = recipeType;
@@ -194,6 +200,7 @@ public class SlimefunItem implements Placeable {
         Validate.notNull(recipeType, "'recipeType' is not allowed to be null!");
 
         this.itemGroup = itemGroup;
+        this.slimefunItemStack = null;
         this.itemStackTemplate = item;
         this.id = id;
         this.recipeType = recipeType;
@@ -280,6 +287,24 @@ public class SlimefunItem implements Placeable {
         decorateBakedTemplate(meta);
 
         itemStackTemplate.setItemMeta(meta);
+
+        if (slimefunItemStack != null) {
+            slimefunItemStack.setItemMeta(meta);
+        }
+
+        if (recipeOutput != null && recipeOutput.hasItemMeta()) {
+            recipeOutput.setItemMeta(meta);
+        }
+    }
+
+    /**
+     * Returns the {@link SlimefunItemStack} associated with this {@link SlimefunItem}, or null
+     * if it was registered using a generic {@link ItemStack}.
+     *
+     * @return The underlying {@link SlimefunItemStack}
+     */
+    public @Nullable SlimefunItemStack getSlimefunItemStack() {
+        return slimefunItemStack;
     }
 
     /**
