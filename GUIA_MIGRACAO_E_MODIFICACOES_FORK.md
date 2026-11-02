@@ -617,5 +617,29 @@ O addon **MobCapturer** (canhão de captura de mobs e ovos de spawn gerados dina
 5. **Deploy:**
    - Compilado com sucesso via Gradle gerando `MobCapturer-v1.0.jar` e copiado para a pasta de plugins do servidor (`servidor_26.1.2/plugins/MobCapturer-v1.0.jar`).
 
+---
+
+## 21. Migração do Addon SFCalc para Slimefun5 (v1.0)
+
+### 21.1 O Que Mudou no SFCalc
+O addon **SFCalc** (calculadora de receitas e materiais brutos do Slimefun) foi atualizado para compilar contra o fork **`com.github.MaikonPlotegher:Slimefun5:v1.0`** em Paper 1.21.x e Java 25.
+
+### 21.2 Principais Ajustes Realizados:
+1. **Configuração Gradle (`build.gradle.kts`):**
+   - Atualizado para `compileOnly("com.github.MaikonPlotegher:Slimefun5:v1.0")` e `compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")`.
+   - Compatibilidade de Java definida para Java 21+.
+   - Nome do arquivo de saída configurado para `SFCalc-v1.0.jar`.
+2. **Upgrade do Gradle Wrapper:**
+   - O Gradle 8.3 original foi atualizado para o **Gradle 9.3.1** para suporte completo à JVM 25.
+3. **Eliminação de Dependências Externas Frágeis:**
+   - Dependência remota `ErrorReporter-Java` do JitPack foi substituída por uma classe local autônoma [`ErrorReporter.java`](file:///c:/Users/maiko/OneDrive/Documents/slimefun5%20addons/em%20andamento/SFCalc/src/main/java/io/github/seggan/errorreporter/ErrorReporter.java), evitando falhas de resolução e requisições externas em caso de erros.
+   - Remoção completa do Lombok para evitar travamentos do `javac` no Java 25, utilizando métodos getters padrão.
+4. **Migração para Slimefun5:**
+   - Imports de receitas e instâncias migrados de `io.github.thebusybiscuit.slimefun4.*` para `slimefun5.*`.
+   - `Validate` migrado para `io.github.thebusybiscuit.slimefun5.libraries.commons.lang.Validate` (eliminando a dependência do pacote antigo `org.apache.commons.lang.Validate` que não existe mais no Paper 1.21+).
+5. **Deploy:**
+   - Compilado via Gradle gerando `SFCalc-v1.0.jar` e copiado para a pasta de plugins do servidor (`servidor_26.1.2/plugins/SFCalc-v1.0.jar`).
+
+
 
 
