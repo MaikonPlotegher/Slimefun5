@@ -637,8 +637,14 @@ O addon **SFCalc** (calculadora de receitas e materiais brutos do Slimefun) foi 
 4. **Migração para Slimefun5:**
    - Imports de receitas e instâncias migrados de `io.github.thebusybiscuit.slimefun4.*` para `slimefun5.*`.
    - `Validate` migrado para `io.github.thebusybiscuit.slimefun5.libraries.commons.lang.Validate` (eliminando a dependência do pacote antigo `org.apache.commons.lang.Validate` que não existe mais no Paper 1.21+).
-5. **Deploy:**
+5. **Modernização e Novas Funcionalidades Implementadas:**
+   - **Interface Gráfica Interativa (`CalcMenu.java`):** Criado menu de 54 slots baseado em `ChestMenu` com paginação automática, exibindo os ícones reais de cada ingrediente, quantidade necessária, quantidade no inventário do jogador e o que falta coletar (com indicador verde/vermelho). O botão de filtro no slot 49 permite alternar entre "Ver Todos os Materiais" e "Ver Apenas Faltantes", e clicar em qualquer sub-ingrediente abre o cálculo dele recursivamente.
+   - **Subcomando `/sfcalc need <item> [qtd]`:** Ativado o cálculo comparativo contra o inventário do jogador no chat.
+   - **Subcomandos de Mão (`/sfcalc hand`, `/sfcalc handneed`, `/sfcalc handgui`):** Detectam automaticamente o item do Slimefun segurado na mão principal do jogador sem exigir digitação de IDs.
+   - **Auto-complete Dinâmico:** Tab completer inteligente para todos os subcomandos, IDs de itens e quantidades rápidas (`1, 4, 16, 64`).
+6. **Deploy:**
    - Compilado via Gradle gerando `SFCalc-v1.0.jar` e copiado para a pasta de plugins do servidor (`servidor_26.1.2/plugins/SFCalc-v1.0.jar`).
+
 
 
 
