@@ -46,6 +46,7 @@ import io.github.thebusybiscuit.slimefun5.implementation.SlimefunItems;
 import io.github.thebusybiscuit.slimefun5.implementation.items.altar.AltarRecipe;
 import io.github.thebusybiscuit.slimefun5.implementation.items.altar.AncientAltar;
 import io.github.thebusybiscuit.slimefun5.implementation.items.altar.AncientPedestal;
+import io.github.thebusybiscuit.slimefun5.implementation.items.blocks.BrokenSpawner;
 import io.github.thebusybiscuit.slimefun5.implementation.items.blocks.RepairedSpawner;
 import io.github.thebusybiscuit.slimefun5.implementation.tasks.AncientAltarTask;
 import io.github.thebusybiscuit.slimefun5.utils.SlimefunUtils;
@@ -337,16 +338,46 @@ public class AncientAltarListener implements Listener {
         ItemStackWrapper wrapper = ItemStackWrapper.wrap(catalyst);
         List<ItemStackWrapper> items = ItemStackWrapper.wrapList(inputs);
 
-        if (SlimefunUtils.isItemSimilar(wrapper, SlimefunItems.BROKEN_SPAWNER.item(), false, false)) {
+        if (isBrokenSpawner(wrapper)) {
             if (!checkRecipe(SlimefunItems.BROKEN_SPAWNER.item(), items).isPresent()) {
                 return Optional.empty();
             }
 
             RepairedSpawner spawner = (RepairedSpawner) SlimefunItems.REPAIRED_SPAWNER.getItem();
-            return Optional.of(spawner.getItemForEntityType(spawner.getEntityType(wrapper).orElse(EntityType.PIG)));
+            EntityType mobType = getBrokenSpawnerEntityType(wrapper).orElse(EntityType.PIG);
+            return Optional.of(spawner.getItemForEntityType(mobType));
         }
 
         return checkRecipe(wrapper, items);
+    }
+
+    private boolean isBrokenSpawner(@Nonnull ItemStack item) {
+        SlimefunItem sfItem = SlimefunItem.getByItem(item);
+        if (sfItem != null) {
+            String id = sfItem.getId();
+            if ("BROKEN_SPAWNER".equals(id) || sfItem instanceof BrokenSpawner || id.endsWith("_BROKEN_SPAWNER")) {
+                return true;
+            }
+        }
+        return SlimefunUtils.isItemSimilar(item, SlimefunItems.BROKEN_SPAWNER.item(), false, false, false);
+    }
+
+    private @Nonnull Optional<EntityType> getBrokenSpawnerEntityType(@Nonnull ItemStack item) {
+        SlimefunItem sfItem = SlimefunItem.getByItem(item);
+        if (sfItem != null && sfItem.getId().endsWith("_BROKEN_SPAWNER") && !"BROKEN_SPAWNER".equals(sfItem.getId())) {
+            String mobName = sfItem.getId().substring(0, sfItem.getId().length() - "_BROKEN_SPAWNER".length());
+            try {
+                return Optional.of(EntityType.valueOf(mobName));
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        RepairedSpawner spawner = (RepairedSpawner) SlimefunItems.REPAIRED_SPAWNER.getItem();
+        if (spawner != null) {
+            return spawner.getEntityType(item);
+        }
+
+        return Optional.empty();
     }
 
     private @Nonnull Optional<ItemStack> checkRecipe(@Nonnull ItemStack catalyst, @Nonnull List<ItemStackWrapper> items) {
