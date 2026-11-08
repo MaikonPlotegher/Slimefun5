@@ -98,10 +98,10 @@ public class ElectricGoldPan extends AContainer implements RecipeDisplayItem {
             ItemStack output = null;
 
             if (goldPan.isValidInput(item)) {
-                output = goldPan.getRandomOutput();
+                output = io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine.prepareCraftOutput(goldPan.getRandomOutput());
                 recipe = new MachineRecipe(3 / getSpeed(), new ItemStack[] { item }, new ItemStack[] { output });
             } else if (netherGoldPan.isValidInput(item)) {
-                output = netherGoldPan.getRandomOutput();
+                output = io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine.prepareCraftOutput(netherGoldPan.getRandomOutput());
                 recipe = new MachineRecipe(4 / getSpeed(), new ItemStack[] { item }, new ItemStack[] { output });
             }
 

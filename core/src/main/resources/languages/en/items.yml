@@ -88,8 +88,8 @@ ANCIENT_RUNE_SOULBOUND:
   type:
   - '&7&oMagical'
   usage:
-  - '&ePlace this rune and an item in a'
-  - '&5Rune Anvil &eto bind that item to your soul.'
+  - '&eDrop this rune on the floor next to an item'
+  - '&eto bind that item to your soul.'
 ANCIENT_RUNE_VILLAGERS:
   description:
   - '&eThe villager will start looking'

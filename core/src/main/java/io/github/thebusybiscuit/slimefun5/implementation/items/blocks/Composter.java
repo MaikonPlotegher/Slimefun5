@@ -111,6 +111,7 @@ public class Composter extends SimpleSlimefunItem<BlockUseHandler> implements Re
     }
 
     private void pushItem(Block b, ItemStack output) {
+        output = io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine.prepareCraftOutput(output);
         Optional<Inventory> outputChest = findOutputChest(b, output);
 
         if (outputChest.isPresent()) {

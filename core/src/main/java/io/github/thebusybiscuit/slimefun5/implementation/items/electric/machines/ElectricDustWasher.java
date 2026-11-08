@@ -55,16 +55,16 @@ public class ElectricDustWasher extends AContainer {
                     return null;
                 }
 
-                recipe = new MachineRecipe(4 / getSpeed(), new ItemStack[] { SlimefunItems.SIFTED_ORE.item() }, new ItemStack[] { oreWasher.getRandomDust() });
+                recipe = new MachineRecipe(4 / getSpeed(), new ItemStack[] { SlimefunItems.SIFTED_ORE.item() }, new ItemStack[] { io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine.prepareCraftOutput(oreWasher.getRandomDust()) });
 
                 if (!legacyMode || menu.fits(recipe.getOutput()[0], getOutputSlots())) {
                     menu.consumeItem(slot);
                     return recipe;
                 }
             } else if (SlimefunUtils.isItemSimilar(input, SlimefunItems.PULVERIZED_ORE.item(), true)) {
-                recipe = new MachineRecipe(4 / getSpeed(), new ItemStack[] { SlimefunItems.PULVERIZED_ORE.item() }, new ItemStack[] { SlimefunItems.PURE_ORE_CLUSTER.item() });
+                recipe = new MachineRecipe(4 / getSpeed(), new ItemStack[] { SlimefunItems.PULVERIZED_ORE.item() }, new ItemStack[] { io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine.prepareCraftOutput(SlimefunItems.PURE_ORE_CLUSTER.item()) });
             } else if (SlimefunUtils.isItemSimilar(input, new ItemStack(Material.SAND), true)) {
-                recipe = new MachineRecipe(4 / getSpeed(), new ItemStack[] { new ItemStack(Material.SAND) }, new ItemStack[] { SlimefunItems.SALT.item() });
+                recipe = new MachineRecipe(4 / getSpeed(), new ItemStack[] { new ItemStack(Material.SAND) }, new ItemStack[] { io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine.prepareCraftOutput(SlimefunItems.SALT.item()) });
             }
 
             if (recipe != null && menu.fits(recipe.getOutput()[0], getOutputSlots())) {

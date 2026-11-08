@@ -32,7 +32,9 @@ import io.github.thebusybiscuit.slimefun5.api.player.PlayerBackpack;
 import io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine;
 import io.github.thebusybiscuit.slimefun5.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun5.implementation.items.VanillaItem;
+import io.github.thebusybiscuit.slimefun5.implementation.items.electric.AbstractEnergyProvider;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineFuel;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 
 /**
@@ -303,12 +305,15 @@ public class ItemTranslationService {
 
                 RenderedDisplay display = renderForPacket(item.getId(), lang, TranslationConfig.FallbackMode.ENGLISH, true);
                 if (display != null && display.name != null && !display.name.equals(item.getId())) {
+                    display = DynamicLoreValues.substitute(item, item.getItem(), display);
                     item.bakeTranslatedDisplay(display.name, display.lore);
                 } else {
                     RenderedDisplay ptDisplay = renderForPacket(item.getId(), "pt", TranslationConfig.FallbackMode.ENGLISH, true);
                     if (ptDisplay != null && ptDisplay.name != null && !ptDisplay.name.equals(item.getId())) {
+                        ptDisplay = DynamicLoreValues.substitute(item, item.getItem(), ptDisplay);
                         item.bakeTranslatedDisplay(ptDisplay.name, ptDisplay.lore);
                     } else if (display != null) {
+                        display = DynamicLoreValues.substitute(item, item.getItem(), display);
                         item.bakeTranslatedDisplay(display.name, display.lore);
                     }
                 }
@@ -318,6 +323,20 @@ public class ItemTranslationService {
         }
 
         // Synchronize recipes and drop tables with baked metadata
+        synchronizeRecipes();
+
+        try {
+            ensureEnglishBaseline();
+        } catch (Exception | LinkageError ignored) {
+            // must not abort boot
+        }
+    }
+
+    /**
+     * Synchronizes all registered recipes, drop tables, and machine outputs with the canonical
+     * baked metadata of each SlimefunItem.
+     */
+    public void synchronizeRecipes() {
         try {
             if (Slimefun.getRegistry() != null) {
                 for (SlimefunItem item : Slimefun.getRegistry().getEnabledSlimefunItems()) {
@@ -325,27 +344,33 @@ public class ItemTranslationService {
                         MultiBlockMachine mbm = (MultiBlockMachine) item;
                         for (ItemStack[] recipeArr : mbm.getRecipes()) {
                             if (recipeArr != null) {
-                                for (ItemStack stack : recipeArr) {
+                                for (int i = 0; i < recipeArr.length; i++) {
+                                    ItemStack stack = recipeArr[i];
                                     if (stack != null && stack.getType() != Material.AIR) {
-                                        SlimefunItem sf = SlimefunItem.getByItem(stack);
-                                        if (sf != null && sf.getItem().hasItemMeta()) {
-                                            stack.setItemMeta(sf.getItem().getItemMeta());
-                                        }
+                                        recipeArr[i] = MultiBlockMachine.prepareCraftOutput(stack);
                                     }
                                 }
                             }
                         }
-                    } else if (item instanceof AContainer) {
-                        AContainer container = (AContainer) item;
-                        for (MachineRecipe recipe : container.getMachineRecipes()) {
+                    } else if (item instanceof io.github.thebusybiscuit.slimefun5.core.machines.AbstractMachine) {
+                        io.github.thebusybiscuit.slimefun5.core.machines.AbstractMachine machine = (io.github.thebusybiscuit.slimefun5.core.machines.AbstractMachine) item;
+                        for (MachineRecipe recipe : machine.getMachineRecipes()) {
                             if (recipe != null && recipe.getOutput() != null) {
-                                for (ItemStack stack : recipe.getOutput()) {
+                                for (int i = 0; i < recipe.getOutput().length; i++) {
+                                    ItemStack stack = recipe.getOutput()[i];
                                     if (stack != null && stack.getType() != Material.AIR) {
-                                        SlimefunItem sf = SlimefunItem.getByItem(stack);
-                                        if (sf != null && sf.getItem().hasItemMeta()) {
-                                            stack.setItemMeta(sf.getItem().getItemMeta());
-                                        }
+                                        recipe.getOutput()[i] = MultiBlockMachine.prepareCraftOutput(stack);
                                     }
+                                }
+                            }
+                        }
+                    } else if (item instanceof AbstractEnergyProvider) {
+                        AbstractEnergyProvider aep = (AbstractEnergyProvider) item;
+                        for (MachineFuel fuel : aep.getFuelTypes()) {
+                            if (fuel != null && fuel.getOutput() != null && fuel.getOutput().getType() != Material.AIR) {
+                                SlimefunItem sf = SlimefunItem.getByItem(fuel.getOutput());
+                                if (sf != null && sf.getItem().hasItemMeta()) {
+                                    fuel.getOutput().setItemMeta(sf.getItem().getItemMeta());
                                 }
                             }
                         }

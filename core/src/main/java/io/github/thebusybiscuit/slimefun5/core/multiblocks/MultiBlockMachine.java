@@ -25,6 +25,7 @@ import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 import io.github.bakedlibs.dough.inventory.InvUtils;
@@ -41,6 +42,8 @@ import io.github.thebusybiscuit.slimefun5.core.attributes.NotPlaceable;
 import io.github.thebusybiscuit.slimefun5.core.attributes.RecipeDisplayItem;
 import io.github.thebusybiscuit.slimefun5.core.handlers.ItemUseHandler;
 import io.github.thebusybiscuit.slimefun5.core.handlers.MultiBlockInteractionHandler;
+import io.github.thebusybiscuit.slimefun5.core.services.localization.ItemTranslationService;
+import io.github.thebusybiscuit.slimefun5.core.services.localization.TranslationConfig;
 import io.github.thebusybiscuit.slimefun5.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun5.integrations.Protections;
 import io.github.thebusybiscuit.slimefun5.implementation.items.blocks.OutputChest;
@@ -253,6 +256,7 @@ public abstract class MultiBlockMachine extends SlimefunItem implements NotPlace
      */
     @ParametersAreNonnullByDefault
     protected void handleCraftedItem(ItemStack outputItem, Block block, Inventory blockInv) {
+        outputItem = prepareCraftOutput(outputItem);
         Inventory outputInv = findOutputInventory(outputItem, block, blockInv);
 
         if (outputInv != null) {
@@ -310,7 +314,7 @@ public abstract class MultiBlockMachine extends SlimefunItem implements NotPlace
                 continue;
             }
 
-            output = output.clone();
+            output = prepareCraftOutput(output.clone());
 
             // Gate on the owner's research/permission: only auto-craft what the owner could craft by hand.
             if (!isAutoCraftUnlockedForOwner(output, owner)) {
@@ -435,6 +439,20 @@ public abstract class MultiBlockMachine extends SlimefunItem implements NotPlace
 
         Optional<PlayerProfile> profile = PlayerProfile.find(Bukkit.getOfflinePlayer(owner));
         return profile.isPresent() && profile.get().hasUnlocked(research);
+    }
+
+    @Nullable
+    public static ItemStack prepareCraftOutput(@Nullable ItemStack output) {
+        if (output == null) {
+            return null;
+        }
+        SlimefunItem sfItem = SlimefunItem.getByItem(output);
+        if (sfItem != null) {
+            ItemStack template = sfItem.getItem().clone();
+            template.setAmount(output.getAmount());
+            return template;
+        }
+        return output;
     }
 
     private static @Nonnull Material[] convertItemStacksToMaterial(@Nonnull ItemStack[] items) {

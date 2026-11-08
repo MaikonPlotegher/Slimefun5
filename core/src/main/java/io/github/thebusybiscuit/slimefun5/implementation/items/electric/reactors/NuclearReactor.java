@@ -6,11 +6,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
+import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun5.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun5.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun5.core.attributes.Radioactive;
 import io.github.thebusybiscuit.slimefun5.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun5.implementation.items.misc.CoolantCell;
 
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineFuel;
 
@@ -46,6 +48,15 @@ public abstract class NuclearReactor extends Reactor {
     @Override
     public ItemStack getCoolant() {
         return SlimefunItems.REACTOR_COOLANT_CELL.item();
+    }
+
+    @Override
+    protected boolean isCoolant(ItemStack item, @Nonnull ItemStack coolant) {
+        if (super.isCoolant(item, coolant)) {
+            return true;
+        }
+        SlimefunItem sfItem = SlimefunItem.getByItem(item);
+        return sfItem instanceof CoolantCell;
     }
 
     @Override

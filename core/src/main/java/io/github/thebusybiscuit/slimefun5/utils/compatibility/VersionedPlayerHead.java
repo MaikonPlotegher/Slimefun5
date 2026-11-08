@@ -36,7 +36,7 @@ import io.github.thebusybiscuit.slimefun5.utils.compatibility.MaterialCompat;
  */
 public final class VersionedPlayerHead {
 
-    private static final String PROFILE_NAME = "CS-CoreLib";
+    private static final String PROFILE_NAME = "Slimefun";
 
     private VersionedPlayerHead() {}
 

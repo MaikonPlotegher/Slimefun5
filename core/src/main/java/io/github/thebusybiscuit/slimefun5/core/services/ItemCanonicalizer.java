@@ -14,7 +14,9 @@ import io.github.thebusybiscuit.slimefun5.api.items.LiveLore;
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun5.core.attributes.DistinctiveItem;
 import io.github.thebusybiscuit.slimefun5.core.attributes.Rechargeable;
+import io.github.thebusybiscuit.slimefun5.core.services.localization.ItemTranslationService;
 import io.github.thebusybiscuit.slimefun5.core.services.localization.RenamedItems;
+import io.github.thebusybiscuit.slimefun5.core.services.localization.TranslationConfig;
 import io.github.thebusybiscuit.slimefun5.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun5.utils.compatibility.PdcCompat;
 import io.github.thebusybiscuit.slimefun5.utils.compatibility.ReflectionCompat;
@@ -106,9 +108,30 @@ public final class ItemCanonicalizer {
         String targetName = templateMeta.hasDisplayName() ? templateMeta.getDisplayName() : null;
         java.util.List<String> targetLore = templateMeta.hasLore() ? templateMeta.getLore() : null;
 
-        // Apply updated name and lore from template
-        meta.setDisplayName(targetName);
-        meta.setLore(targetLore);
+        if (targetName == null || targetName.isEmpty() || id.equals(targetName)) {
+            try {
+                ItemTranslationService.RenderedDisplay display = Slimefun.getItemTranslationService()
+                    .renderForPacket(id, null, TranslationConfig.FallbackMode.ENGLISH, true);
+                if (display != null) {
+                    if (display.name != null && !id.equals(display.name)) {
+                        targetName = display.name;
+                    }
+                    if (targetLore == null || targetLore.isEmpty()) {
+                        targetLore = display.lore;
+                    }
+                }
+            } catch (Exception ignored) {
+                // ignore
+            }
+        }
+
+        if (targetName != null) {
+            meta.setDisplayName(targetName);
+        }
+        if (targetLore != null && !targetLore.isEmpty()) {
+            meta.setLore(targetLore);
+        }
+        Slimefun.getItemTextureService().setTexture(meta, id);
         if (Slimefun.getRegistry() != null && Slimefun.getRegistry().getShownOriginalKey() != null) {
             PdcCompat.remove(meta, Slimefun.getRegistry().getShownOriginalKey());
         }

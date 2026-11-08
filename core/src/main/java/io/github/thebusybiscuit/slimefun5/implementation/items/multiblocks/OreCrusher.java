@@ -18,6 +18,7 @@ import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import io.github.bakedlibs.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun5.api.events.MultiBlockCraftEvent;
@@ -186,6 +187,12 @@ public class OreCrusher extends MultiBlockMachine {
                 for (ItemStack convert : RecipeType.getRecipeInputs(this)) {
                     if (convert != null && SlimefunUtils.isItemSimilar(current, convert, true)) {
                         ItemStack adding = RecipeType.getRecipeOutput(this, convert);
+                        if (adding == null) {
+                            continue;
+                        }
+
+                        adding = prepareCraftOutput(adding);
+
                         Inventory outputInv = findOutputInventory(adding, possibleDispenser, inv);
                         MultiBlockCraftEvent event = new MultiBlockCraftEvent(p, this, current, adding);
 
@@ -234,14 +241,31 @@ public class OreCrusher extends MultiBlockMachine {
             quartz.setAmount(value ? 2 : 1);
             goldNuggets.setAmount(value ? 8 : 4);
 
+            int amount = value ? 2 : 1;
+
             SlimefunItem ironDust = SlimefunItem.getById("IRON_DUST");
             if (ironDust != null) {
-                ironDust.setRecipeOutput(new SlimefunItemStack(SlimefunItems.IRON_DUST, value ? 2 : 1).item());
+                ironDust.setRecipeOutput(new SlimefunItemStack(SlimefunItems.IRON_DUST, amount).item());
             }
 
             SlimefunItem goldDust = SlimefunItem.getById("GOLD_DUST");
             if (goldDust != null) {
-                goldDust.setRecipeOutput(new SlimefunItemStack(SlimefunItems.GOLD_DUST, value ? 2 : 1).item());
+                goldDust.setRecipeOutput(new SlimefunItemStack(SlimefunItems.GOLD_DUST, amount).item());
+            }
+
+            SlimefunItem copperDust = SlimefunItem.getById("COPPER_DUST");
+            if (copperDust != null) {
+                copperDust.setRecipeOutput(new SlimefunItemStack(SlimefunItems.COPPER_DUST, amount).item());
+            }
+
+            for (int i = 0; i < recipes.size(); i += 2) {
+                if (i + 1 < recipes.size()) {
+                    ItemStack out = recipes.get(i + 1)[0];
+                    SlimefunItem sf = SlimefunItem.getByItem(out);
+                    if (sf != null && (sf.getId().equals("IRON_DUST") || sf.getId().equals("GOLD_DUST") || sf.getId().equals("COPPER_DUST"))) {
+                        out.setAmount(amount);
+                    }
+                }
             }
         }
 

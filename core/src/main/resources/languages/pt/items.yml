@@ -83,8 +83,8 @@ ANCIENT_RUNE_SOULBOUND:
   type:
   - '&7&oMágico'
   usage:
-  - '&eColoca esta runa e um item numa'
-  - '&5Bigorna de Runas &epara vincular esse item à tua alma.'
+  - '&eLarga esta runa no chão junto a um item'
+  - '&epara vincular esse item à tua alma.'
 ANCIENT_RUNE_VILLAGERS:
   description:
   - '&eO aldeão vai começar a procurar'

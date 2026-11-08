@@ -1,6 +1,7 @@
 package io.github.thebusybiscuit.slimefun5.implementation;
 
 import io.github.thebusybiscuit.slimefun5.utils.compatibility.ItemMetaCompat;
+import io.github.thebusybiscuit.slimefun5.utils.compatibility.MaterialCompat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -496,18 +497,18 @@ public final class SlimefunItems {
     public static final SlimefunItemStack GOLD_24K = new SlimefunItemStack("GOLD_24K", Material.GOLD_INGOT);
 
     /* Dusts */
-    public static final SlimefunItemStack IRON_DUST = new SlimefunItemStack("IRON_DUST", XMaterial.GUNPOWDER.parseMaterial());
+    public static final SlimefunItemStack IRON_DUST = new SlimefunItemStack("IRON_DUST", MaterialCompat.stack(XMaterial.GUNPOWDER));
     public static final SlimefunItemStack GOLD_DUST = new SlimefunItemStack("GOLD_DUST", Material.GLOWSTONE_DUST);
     public static final SlimefunItemStack TIN_DUST = new SlimefunItemStack("TIN_DUST", Material.SUGAR);
     public static final SlimefunItemStack COPPER_DUST = new SlimefunItemStack("COPPER_DUST", Material.GLOWSTONE_DUST);
     public static final SlimefunItemStack SILVER_DUST = new SlimefunItemStack("SILVER_DUST", Material.SUGAR);
     public static final SlimefunItemStack ALUMINUM_DUST = new SlimefunItemStack("ALUMINUM_DUST", Material.SUGAR);
-    public static final SlimefunItemStack LEAD_DUST = new SlimefunItemStack("LEAD_DUST", XMaterial.GUNPOWDER.parseMaterial());
+    public static final SlimefunItemStack LEAD_DUST = new SlimefunItemStack("LEAD_DUST", MaterialCompat.stack(XMaterial.GUNPOWDER));
     public static final SlimefunItemStack ZINC_DUST = new SlimefunItemStack("ZINC_DUST", Material.SUGAR);
     public static final SlimefunItemStack MAGNESIUM_DUST = new SlimefunItemStack("MAGNESIUM_DUST", Material.SUGAR);
 
     public static final SlimefunItemStack SULFATE = new SlimefunItemStack("SULFATE", Material.GLOWSTONE_DUST);
-    public static final SlimefunItemStack SILICON = new SlimefunItemStack("SILICON", XMaterial.FIREWORK_STAR.parseMaterial());
+    public static final SlimefunItemStack SILICON = new SlimefunItemStack("SILICON", MaterialCompat.stack(XMaterial.FIREWORK_STAR));
     public static final SlimefunItemStack GOLD_24K_BLOCK = new SlimefunItemStack("GOLD_24K_BLOCK", Material.GOLD_BLOCK);
 
     /* Gems */

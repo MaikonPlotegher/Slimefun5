@@ -26,6 +26,7 @@ import io.github.thebusybiscuit.slimefun5.core.attributes.EnergyNetComponent;
 import io.github.thebusybiscuit.slimefun5.core.attributes.MachineProcessHolder;
 import io.github.thebusybiscuit.slimefun5.core.attributes.RecipeDisplayItem;
 import io.github.thebusybiscuit.slimefun5.core.handlers.BlockBreakHandler;
+import io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine;
 import io.github.thebusybiscuit.slimefun5.core.networks.energy.EnergyNetComponentType;
 import io.github.thebusybiscuit.slimefun5.implementation.handlers.SimpleBlockBreakHandler;
 import io.github.thebusybiscuit.slimefun5.implementation.operations.CraftingOperation;
@@ -264,6 +265,13 @@ public abstract class AbstractMachine extends SlimefunItem implements InventoryB
 
     public void registerRecipe(MachineRecipe recipe) {
         recipe.setTicks(recipe.getTicks() / getSpeed());
+        if (recipe.getOutput() != null) {
+            for (int i = 0; i < recipe.getOutput().length; i++) {
+                if (recipe.getOutput()[i] != null) {
+                    recipe.getOutput()[i] = MultiBlockMachine.prepareCraftOutput(recipe.getOutput()[i]);
+                }
+            }
+        }
         recipes.add(recipe);
     }
 
@@ -322,7 +330,7 @@ public abstract class AbstractMachine extends SlimefunItem implements InventoryB
                     ChestMenuUtils.updateStatus(inv, statusSlot, MachineStatus.IDLE.getItem());
 
                     for (ItemStack output : currentOperation.getResults()) {
-                        inv.pushItem(output.clone(), getOutputSlots());
+                        inv.pushItem(MultiBlockMachine.prepareCraftOutput(output.clone()), getOutputSlots());
                     }
 
                     processor.endOperation(b);

@@ -193,7 +193,7 @@ public class RuneAnvil extends SlimefunItem implements InventoryBlock {
         // Keep an existing preview stable (do NOT re-roll a random enchant every tick) as long as it
         // still matches the current input item's type.
         if (output != null && output.getType() != Material.AIR && item != null && output.getType() == item.getType()
-                && rune != null && (isRune(rune, SlimefunItems.SOULBOUND_RUNE, "SOULBOUND_RUNE") || isRune(rune, SlimefunItems.ENCHANTMENT_RUNE, "ENCHANTMENT_RUNE"))) {
+                && rune != null && (isRune(rune, SlimefunItems.SOULBOUND_RUNE) || isRune(rune, SlimefunItems.ENCHANTMENT_RUNE))) {
             return;
         }
 
@@ -215,7 +215,7 @@ public class RuneAnvil extends SlimefunItem implements InventoryBlock {
             return null;
         }
 
-        if (isRune(rune, SlimefunItems.SOULBOUND_RUNE, "SOULBOUND_RUNE")) {
+        if (isRune(rune, SlimefunItems.SOULBOUND_RUNE)) {
             if (SlimefunUtils.isSoulbound(item)) {
                 return null;
             }
@@ -223,20 +223,20 @@ public class RuneAnvil extends SlimefunItem implements InventoryBlock {
             ItemStack result = item.clone();
             SlimefunUtils.setSoulbound(result, true);
             return result;
-        } else if (isRune(rune, SlimefunItems.ENCHANTMENT_RUNE, "ENCHANTMENT_RUNE")) {
+        } else if (isRune(rune, SlimefunItems.ENCHANTMENT_RUNE)) {
             return enchant(item);
         }
 
         return null;
     }
 
-    private boolean isRune(@Nonnull ItemStack rune, @Nonnull SlimefunItemStack expected, @Nonnull String id) {
-        if (SlimefunUtils.isItemSimilar(rune, expected.item(), true)) {
+    private boolean isRune(@Nonnull ItemStack rune, @Nonnull SlimefunItemStack expected) {
+        if (SlimefunUtils.isItemSimilar(rune, expected.item(), false)) {
             return true;
         }
 
         SlimefunItem sfItem = SlimefunItem.getByItem(rune);
-        return sfItem != null && sfItem.getId().equals(id);
+        return sfItem != null && sfItem.getId().equals(expected.getItemId());
     }
 
     @Nullable

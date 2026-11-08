@@ -23,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import io.github.bakedlibs.dough.items.CustomItemStack;
 import io.github.bakedlibs.dough.protection.Interaction;
 import io.github.thebusybiscuit.slimefun5.api.events.ReactorExplodeEvent;
+import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun5.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun5.api.recipes.RecipeType;
@@ -213,9 +214,9 @@ public abstract class Reactor extends AbstractEnergyProvider implements Hologram
         }
 
         if (needsCooling()) {
-            preset.addItem(7, ChestMenuUtils.stripTranslationIdentity(CustomItemStack.create(getCoolant(), "&bCoolant Slot", "", "&fThis Slot accepts Coolant Cells", "&4Without any Coolant Cells, your Reactor", "&4will explode")));
+            preset.addItem(7, ChestMenuUtils.stripTranslationIdentity(CustomItemStack.create(getCoolant(), "&bCoolant Slot", "", "&fThis Slot accepts Coolant Cells", "&4Without any Coolant Cells, your Reactor", "&4will explode")), ChestMenuUtils.getEmptyClickHandler());
         } else {
-            preset.addItem(7, CustomItemStack.create(Material.BARRIER, "&bCoolant Slot", "", "&fThis Slot accepts Coolant Cells"));
+            preset.addItem(7, CustomItemStack.create(Material.BARRIER, "&bCoolant Slot", "", "&fThis Slot accepts Coolant Cells"), ChestMenuUtils.getEmptyClickHandler());
 
             for (int i : border_4) {
                 preset.addItem(i, CustomItemStack.create(Material.BARRIER, "&cNo Coolant Required"), ChestMenuUtils.getEmptyClickHandler());
@@ -435,6 +436,20 @@ public abstract class Reactor extends AbstractEnergyProvider implements Hologram
      *
      * @return Whether the {@link Reactor} was successfully cooled, if not it should explode
      */
+    protected boolean isCoolant(@Nullable ItemStack item, @Nonnull ItemStack coolant) {
+        if (item == null || item.getType() == Material.AIR) {
+            return false;
+        }
+        if (SlimefunUtils.isItemSimilar(item, coolant, false, false)) {
+            return true;
+        }
+        SlimefunItem sfItem = SlimefunItem.getByItem(item);
+        if (sfItem != null && sfItem.getId().equals(SlimefunItems.REACTOR_COOLANT_CELL.getItemId())) {
+            return true;
+        }
+        return false;
+    }
+
     private boolean hasEnoughCoolant(@Nonnull Location reactor, @Nonnull BlockMenu menu, @Nullable BlockMenu accessPort, @Nonnull FuelOperation operation) {
         boolean requiresCoolant = operation.getProgress() % COOLANT_DURATION == 0;
 
@@ -443,19 +458,30 @@ public abstract class Reactor extends AbstractEnergyProvider implements Hologram
 
             if (accessPort != null) {
                 for (int slot : getCoolantSlots()) {
-                    if (SlimefunUtils.isItemSimilar(accessPort.getItemInSlot(slot), coolant, true, false)) {
+                    if (isCoolant(accessPort.getItemInSlot(slot), coolant)) {
                         ItemStack remainingItem = menu.pushItem(accessPort.getItemInSlot(slot), getCoolantSlots());
                         accessPort.replaceExistingItem(slot, remainingItem);
                     }
                 }
+                if (isCoolant(accessPort.getItemInSlot(7), coolant)) {
+                    ItemStack remainingItem = menu.pushItem(accessPort.getItemInSlot(7), getCoolantSlots());
+                    accessPort.replaceExistingItem(7, remainingItem);
+                }
             }
 
             for (int slot : getCoolantSlots()) {
-                if (SlimefunUtils.isItemSimilar(menu.getItemInSlot(slot), coolant, true, false)) {
+                if (isCoolant(menu.getItemInSlot(slot), coolant)) {
                     menu.consumeItem(slot);
                     updateHologram(reactor.getBlock(), "&b\u2744 &7100%");
                     return true;
                 }
+            }
+
+            // Fallback: in case a player put the coolant cell into slot 7 (the header icon)
+            if (isCoolant(menu.getItemInSlot(7), coolant)) {
+                menu.consumeItem(7);
+                updateHologram(reactor.getBlock(), "&b\u2744 &7100%");
+                return true;
             }
 
             return false;

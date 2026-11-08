@@ -96,6 +96,10 @@ public class SlimefunItemStack {
         Slimefun.getItemDataService().setItemData(meta, id);
         Slimefun.getItemTextureService().setTexture(meta, id);
 
+        if (meta != null && !meta.hasDisplayName() && !isInternalChromeId(id)) {
+            meta.setDisplayName(id);
+        }
+
         setItemMeta(meta);
     }
 
@@ -252,7 +256,7 @@ public class SlimefunItemStack {
     }
 
     public SlimefunItemStack(@Nonnull SlimefunItemStack item, int amount) {
-        this(item.getItemId(), item.item());
+        this(item.getItemId(), item.getItem() != null && item.getItem().getItem().hasItemMeta() ? item.getItem().getItem() : item.item());
         setAmount(amount);
     }
 

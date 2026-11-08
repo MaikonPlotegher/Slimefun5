@@ -300,7 +300,7 @@ public class GEOMiner extends SlimefunItem implements RecipeDisplayItem, EnergyN
                 operation.addProgress(getSpeed());
             } else {
                 ChestMenuUtils.updateStatus(inv, 4, MachineStatus.IDLE.getItem());
-                inv.pushItem(operation.getResult(), OUTPUT_SLOTS);
+                inv.pushItem(io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine.prepareCraftOutput(operation.getResult()), OUTPUT_SLOTS);
 
                 processor.endOperation(b);
             }

@@ -185,6 +185,7 @@ public final class PostSetup {
         lintUncategorizedItems();
         loadOreGrinderRecipes();
         loadSmelteryRecipes();
+        Slimefun.getItemTranslationService().synchronizeRecipes();
 
         CommandSender sender = Bukkit.getConsoleSender();
 
@@ -300,7 +301,7 @@ public final class PostSetup {
             stream = stream.sorted((a, b) -> Integer.compare(b[0].getAmount(), a[0].getAmount()));
         }
 
-        stream.forEach(recipe -> registerMachineRecipe("ELECTRIC_ORE_GRINDER", 4, new ItemStack[] { recipe[0] }, new ItemStack[] { recipe[1] }));
+        stream.forEach(recipe -> registerMachineRecipe("ELECTRIC_ORE_GRINDER", 4, new ItemStack[] { recipe[0] }, new ItemStack[] { io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine.prepareCraftOutput(recipe[1]) }));
     }
 
     private static void loadSmelteryRecipes() {
@@ -345,12 +346,12 @@ public final class PostSetup {
 
         // We want to redirect Dust to Ingot Recipes
         if (ingredients.size() == 1 && isDust(ingredients.get(0))) {
-            makeshiftSmeltery.addRecipe(new ItemStack[] { ingredients.get(0) }, output[0]);
+            makeshiftSmeltery.addRecipe(new ItemStack[] { ingredients.get(0) }, io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine.prepareCraftOutput(output[0]));
 
-            registerMachineRecipe("ELECTRIC_INGOT_FACTORY", 8, new ItemStack[] { ingredients.get(0) }, new ItemStack[] { output[0] });
-            registerMachineRecipe("ELECTRIC_INGOT_PULVERIZER", 3, new ItemStack[] { output[0] }, new ItemStack[] { ingredients.get(0) });
+            registerMachineRecipe("ELECTRIC_INGOT_FACTORY", 8, new ItemStack[] { ingredients.get(0) }, new ItemStack[] { io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine.prepareCraftOutput(output[0]) });
+            registerMachineRecipe("ELECTRIC_INGOT_PULVERIZER", 3, new ItemStack[] { output[0] }, new ItemStack[] { io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine.prepareCraftOutput(ingredients.get(0)) });
         } else {
-            registerMachineRecipe("ELECTRIC_SMELTERY", 12, ingredients.toArray(new ItemStack[0]), new ItemStack[] { output[0] });
+            registerMachineRecipe("ELECTRIC_SMELTERY", 12, ingredients.toArray(new ItemStack[0]), new ItemStack[] { io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine.prepareCraftOutput(output[0]) });
         }
     }
 

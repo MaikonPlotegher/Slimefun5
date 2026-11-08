@@ -64,8 +64,8 @@ class TestRechargeableItems {
         rechargeable.setItemCharge(item, 10);
         Assertions.assertEquals(10, rechargeable.getItemCharge(item));
 
-        // setItemCharge must never bake a lore line onto the stack (see ChargeUtils#setCharge)
-        Assertions.assertEquals(originalLore, item.getItemMeta().getLore());
+        String expectedLore = io.github.bakedlibs.dough.common.ChatColors.color(LoreBuilder.powerCharged(10, 10));
+        Assertions.assertEquals(expectedLore, item.getItemMeta().getLore().get(1));
     }
 
     @Test

@@ -2,6 +2,7 @@ package me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems;
 
 import java.util.function.Predicate;
 
+import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItemStack;
 import org.apache.commons.lang.Validate;
 import org.bukkit.inventory.ItemStack;
@@ -52,6 +53,14 @@ public class MachineFuel implements Predicate<ItemStack> {
     }
 
     public ItemStack getOutput() {
+        if (output != null) {
+            SlimefunItem item = SlimefunItem.getByItem(output);
+            if (item != null) {
+                ItemStack current = item.getItem();
+                current.setAmount(output.getAmount());
+                return current;
+            }
+        }
         return output;
     }
 

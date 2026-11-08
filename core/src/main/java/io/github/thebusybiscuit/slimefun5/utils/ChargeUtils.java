@@ -4,6 +4,8 @@ import io.github.thebusybiscuit.slimefun5.utils.compatibility.PdcCompat;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
@@ -51,6 +53,33 @@ public final class ChargeUtils {
 
         NamespacedKey key = Slimefun.getRegistry().getItemChargeDataKey();
         PdcCompat.set(meta, key, "FLOAT", value);
+
+        if (meta.hasLore()) {
+            List<String> lore = meta.getLore();
+            boolean updated = false;
+
+            for (int i = 0; i < lore.size(); i++) {
+                String line = lore.get(i);
+                if (line.contains("%charge%") || REGEX.matcher(line).matches() || (line.contains("\u26A1") && line.contains("/"))) {
+                    lore.set(i, LORE_PREFIX + formatFloat(value) + " / " + formatFloat(capacity) + " J");
+                    updated = true;
+                    break;
+                }
+            }
+
+            if (updated) {
+                meta.setLore(lore);
+            }
+        }
+    }
+
+    @Nonnull
+    private static String formatFloat(float value) {
+        if (value == (long) value) {
+            return String.format(Locale.ROOT, "%d", (long) value);
+        } else {
+            return String.format(Locale.ROOT, "%.1f", value);
+        }
     }
 
     public static float getCharge(@Nonnull ItemMeta meta) {

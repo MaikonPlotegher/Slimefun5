@@ -49,7 +49,7 @@ abstract class AbstractSmeltery extends MultiBlockMachine {
 
             for (int i = 0; i < inputs.size(); i++) {
                 if (canCraft(inv, inputs, i)) {
-                    ItemStack output = RecipeType.getRecipeOutputList(this, inputs.get(i)).clone();
+                    ItemStack output = prepareCraftOutput(RecipeType.getRecipeOutputList(this, inputs.get(i)).clone());
                     MultiBlockCraftEvent event = new MultiBlockCraftEvent(p, this, inputs.get(i), output);
 
                     Bukkit.getPluginManager().callEvent(event);

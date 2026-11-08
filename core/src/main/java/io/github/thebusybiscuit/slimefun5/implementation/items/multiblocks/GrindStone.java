@@ -126,7 +126,7 @@ public class GrindStone extends MultiBlockMachine {
             for (ItemStack current : inv.getContents()) {
                 for (ItemStack convert : RecipeType.getRecipeInputs(this)) {
                     if (convert != null && SlimefunUtils.isItemSimilar(current, convert, true)) {
-                        ItemStack output = RecipeType.getRecipeOutput(this, convert);
+                        ItemStack output = prepareCraftOutput(RecipeType.getRecipeOutput(this, convert));
                         Inventory outputInv = findOutputInventory(output, possibleDispenser, inv);
                         MultiBlockCraftEvent event = new MultiBlockCraftEvent(p, this, current, output);
 
