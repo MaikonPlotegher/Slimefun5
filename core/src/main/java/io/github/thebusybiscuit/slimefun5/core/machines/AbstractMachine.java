@@ -330,7 +330,7 @@ public abstract class AbstractMachine extends SlimefunItem implements InventoryB
                     ChestMenuUtils.updateStatus(inv, statusSlot, MachineStatus.IDLE.getItem());
 
                     for (ItemStack output : currentOperation.getResults()) {
-                        inv.pushItem(MultiBlockMachine.prepareCraftOutput(output.clone()), getOutputSlots());
+                        inv.pushItem(output.clone(), getOutputSlots());
                     }
 
                     processor.endOperation(b);

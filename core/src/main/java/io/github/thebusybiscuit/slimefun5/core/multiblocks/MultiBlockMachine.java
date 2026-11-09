@@ -447,8 +447,30 @@ public abstract class MultiBlockMachine extends SlimefunItem implements NotPlace
             return null;
         }
         SlimefunItem sfItem = SlimefunItem.getByItem(output);
-        if (sfItem != null) {
+        if (sfItem != null && !(sfItem instanceof io.github.thebusybiscuit.slimefun5.core.attributes.DistinctiveItem)
+                && !(sfItem instanceof io.github.thebusybiscuit.slimefun5.core.attributes.Rechargeable)) {
             ItemStack template = sfItem.getItem().clone();
+            ItemMeta outMeta = output.getItemMeta();
+            ItemMeta tplMeta = template.getItemMeta();
+
+            if (outMeta != null && tplMeta != null) {
+                if (!outMeta.getEnchants().equals(tplMeta.getEnchants())) {
+                    return output;
+                }
+                if (outMeta instanceof org.bukkit.inventory.meta.EnchantmentStorageMeta && tplMeta instanceof org.bukkit.inventory.meta.EnchantmentStorageMeta) {
+                    if (!((org.bukkit.inventory.meta.EnchantmentStorageMeta) outMeta).getStoredEnchants()
+                            .equals(((org.bukkit.inventory.meta.EnchantmentStorageMeta) tplMeta).getStoredEnchants())) {
+                        return output;
+                    }
+                }
+                if (outMeta instanceof org.bukkit.inventory.meta.Damageable && ((org.bukkit.inventory.meta.Damageable) outMeta).hasDamage()) {
+                    return output;
+                }
+                if (outMeta instanceof org.bukkit.inventory.meta.Repairable && ((org.bukkit.inventory.meta.Repairable) outMeta).hasRepairCost()) {
+                    return output;
+                }
+            }
+
             template.setAmount(output.getAmount());
             return template;
         }
