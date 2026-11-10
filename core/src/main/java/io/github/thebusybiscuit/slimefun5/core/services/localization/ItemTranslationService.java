@@ -1055,6 +1055,23 @@ public class ItemTranslationService {
             lines.addAll(englishDisplay.lore);
         }
 
+        SlimefunItem sfItem = SlimefunItem.getById(id);
+        if (sfItem != null) {
+            try {
+                if (Slimefun.getLocalization() != null && Slimefun.getLocalization().getLanguages() != null) {
+                    for (Language lang : Slimefun.getLocalization().getLanguages()) {
+                        lines.addAll(EnchantDisplay.lines(sfItem, lang.getId()));
+                    }
+                }
+            } catch (Exception | LinkageError ignored) {
+                // fall back to common languages
+            }
+            lines.addAll(EnchantDisplay.lines(sfItem, "pt-BR"));
+            lines.addAll(EnchantDisplay.lines(sfItem, "pt"));
+            lines.addAll(EnchantDisplay.lines(sfItem, "en"));
+            lines.addAll(EnchantDisplay.lines(sfItem, "es"));
+        }
+
         Set<String> normalized = Collections.unmodifiableSet(RuntimeLore.normalizeAll(lines));
 
         if (englishDisplay != null) {

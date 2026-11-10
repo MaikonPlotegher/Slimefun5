@@ -2,8 +2,11 @@ package io.github.thebusybiscuit.slimefun5.core.services.localization;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -47,6 +50,47 @@ public final class EnchantDisplay {
         if (canReposition()) {
             VersionedItemFlag.removeFlags(meta, VersionedItemFlag.HIDE_ENCHANTS);
         }
+    }
+
+    /**
+     * Removes any lore lines representing the given enchantment from the item's lore.
+     */
+    public static void removeEnchantmentLore(@Nonnull ItemMeta meta, @Nonnull Enchantment enchantment, int level) {
+        if (!meta.hasLore()) {
+            return;
+        }
+
+        List<String> lore = meta.getLore();
+        if (lore == null || lore.isEmpty()) {
+            return;
+        }
+
+        Set<String> targets = new HashSet<>();
+        try {
+            if (Slimefun.getLocalization() != null && Slimefun.getLocalization().getLanguages() != null) {
+                for (Language lang : Slimefun.getLocalization().getLanguages()) {
+                    targets.add(ChatColor.stripColor(prettyName(enchantment, lang.getId()) + " " + roman(level)).trim().toLowerCase(Locale.ROOT));
+                }
+            }
+        } catch (Exception | LinkageError ignored) {
+            // fall back to default languages below
+        }
+
+        targets.add(ChatColor.stripColor(prettyName(enchantment, "pt-BR") + " " + roman(level)).trim().toLowerCase(Locale.ROOT));
+        targets.add(ChatColor.stripColor(prettyName(enchantment, "pt") + " " + roman(level)).trim().toLowerCase(Locale.ROOT));
+        targets.add(ChatColor.stripColor(prettyName(enchantment, "en") + " " + roman(level)).trim().toLowerCase(Locale.ROOT));
+        targets.add(ChatColor.stripColor(prettyName(enchantment, "es") + " " + roman(level)).trim().toLowerCase(Locale.ROOT));
+
+        List<String> newLore = new ArrayList<>(lore.size());
+        for (String line : lore) {
+            String stripped = ChatColor.stripColor(line).trim().toLowerCase(Locale.ROOT);
+            if (!targets.contains(stripped)) {
+                newLore.add(line);
+            }
+        }
+
+        newLore = LoreComposer.normalizeBlankLines(newLore);
+        meta.setLore(newLore.isEmpty() ? null : newLore);
     }
 
     /**
