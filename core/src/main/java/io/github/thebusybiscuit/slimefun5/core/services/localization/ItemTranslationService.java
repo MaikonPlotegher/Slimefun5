@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -33,6 +34,7 @@ import io.github.thebusybiscuit.slimefun5.core.multiblocks.MultiBlockMachine;
 import io.github.thebusybiscuit.slimefun5.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun5.implementation.items.VanillaItem;
 import io.github.thebusybiscuit.slimefun5.implementation.items.electric.AbstractEnergyProvider;
+import io.github.thebusybiscuit.slimefun5.utils.compatibility.VersionedItemFlag;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineFuel;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
@@ -902,8 +904,92 @@ public class ItemTranslationService {
         // name resolves so the counter follows the translation instead of being baked into it.
         display = appendVariantCounter(item, display);
 
+        // Adjust enchantment lines if this specific stack's enchantments differ from the template.
+        display = adjustEnchantmentLore(slimefunItem, item, display, languageId);
+
         // A resolver describes the stack itself, so whatever lore the stack carries is what it replaced.
         return contributed != null ? display : appendRuntimeLore(item, id, display);
+    }
+
+    @Nonnull
+    private RenderedDisplay adjustEnchantmentLore(@Nullable SlimefunItem slimefunItem, @Nonnull ItemStack item,
+            @Nonnull RenderedDisplay display, @Nullable String languageId) {
+        if (slimefunItem == null || !EnchantDisplay.canReposition()) {
+            return display;
+        }
+
+        if (wasAuthorEnchantHidden(slimefunItem.getId())) {
+            return display;
+        }
+
+        Map<Enchantment, Integer> templateEnchants;
+        try {
+            templateEnchants = slimefunItem.getItem().getEnchantments();
+        } catch (Exception | LinkageError e) {
+            templateEnchants = Collections.emptyMap();
+        }
+
+        Map<Enchantment, Integer> itemEnchants;
+        try {
+            itemEnchants = item.getEnchantments();
+        } catch (Exception | LinkageError e) {
+            itemEnchants = Collections.emptyMap();
+        }
+
+        if (itemEnchants.equals(templateEnchants)) {
+            return display;
+        }
+
+        List<String> templateLines = EnchantDisplay.lines(slimefunItem, languageId);
+        List<String> actualLines = EnchantDisplay.linesForEnchantments(itemEnchants, languageId);
+
+        List<String> newLore = new ArrayList<>(display.lore);
+
+        if (!templateLines.isEmpty()) {
+            int index = Collections.indexOfSubList(newLore, templateLines);
+            if (index >= 0) {
+                for (int i = 0; i < templateLines.size(); i++) {
+                    newLore.remove(index);
+                }
+                if (!actualLines.isEmpty()) {
+                    newLore.addAll(index, actualLines);
+                }
+            } else {
+                int firstIndex = -1;
+                for (int i = 0; i < newLore.size(); i++) {
+                    if (templateLines.contains(newLore.get(i))) {
+                        firstIndex = i;
+                        break;
+                    }
+                }
+                newLore.removeAll(templateLines);
+                if (!actualLines.isEmpty()) {
+                    if (firstIndex >= 0) {
+                        newLore.addAll(firstIndex, actualLines);
+                    } else {
+                        newLore.addAll(actualLines);
+                    }
+                }
+            }
+            newLore = LoreComposer.normalizeBlankLines(newLore);
+            return new RenderedDisplay(display.name, newLore);
+        } else if (!actualLines.isEmpty()) {
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null && VersionedItemFlag.HIDE_ENCHANTS != null && meta.hasItemFlag(VersionedItemFlag.HIDE_ENCHANTS)) {
+                int insertIndex = 0;
+                for (int i = 0; i < newLore.size(); i++) {
+                    if (newLore.get(i).isEmpty()) {
+                        insertIndex = i + 1;
+                        break;
+                    }
+                }
+                newLore.addAll(insertIndex, actualLines);
+                newLore = LoreComposer.normalizeBlankLines(newLore);
+                return new RenderedDisplay(display.name, newLore);
+            }
+        }
+
+        return display;
     }
 
     /**

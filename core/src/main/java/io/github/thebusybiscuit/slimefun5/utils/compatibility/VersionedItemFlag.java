@@ -37,6 +37,15 @@ public class VersionedItemFlag {
         }
     }
 
+    /** Safely removes {@link ItemFlag}s from {@link ItemMeta}, skipping null flags that don't exist in the current Minecraft version. */
+    public static void removeFlags(@Nonnull ItemMeta meta, @Nullable ItemFlag... flags) {
+        for (ItemFlag flag : flags) {
+            if (flag != null) {
+                meta.removeItemFlags(flag);
+            }
+        }
+    }
+
     @Nullable
     private static ItemFlag getKey(@Nonnull String key) {
         try {

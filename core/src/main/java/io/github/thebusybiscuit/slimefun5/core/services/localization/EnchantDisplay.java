@@ -42,6 +42,43 @@ public final class EnchantDisplay {
         }
     }
 
+    /** Reveals the vanilla enchantment tooltip when enchantments are removed or repositioning is no longer needed. */
+    public static void reveal(@Nonnull ItemMeta meta) {
+        if (canReposition()) {
+            VersionedItemFlag.removeFlags(meta, VersionedItemFlag.HIDE_ENCHANTS);
+        }
+    }
+
+    /**
+     * Grey enchantment lines (e.g. {@code Knockback II}) for the given enchantments, to sit
+     * under the Type block. Empty when enchantments is null/empty or repositioning is unsupported.
+     */
+    @Nonnull
+    public static List<String> linesForEnchantments(@Nullable Map<Enchantment, Integer> enchantments, @Nullable String languageId) {
+        if (!canReposition() || enchantments == null || enchantments.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Map.Entry<Enchantment, Integer>> entries = new ArrayList<>(enchantments.entrySet());
+        entries.sort((a, b) -> {
+            String nameA = prettyName(a.getKey(), languageId);
+            String nameB = prettyName(b.getKey(), languageId);
+            int cmp = nameA.compareTo(nameB);
+            if (cmp != 0) {
+                return cmp;
+            }
+            return Integer.compare(a.getValue(), b.getValue());
+        });
+
+        List<String> out = new ArrayList<>(entries.size());
+
+        for (Map.Entry<Enchantment, Integer> entry : entries) {
+            out.add(ChatColor.GRAY + prettyName(entry.getKey(), languageId) + " " + roman(entry.getValue()));
+        }
+
+        return out;
+    }
+
     /**
      * Grey enchantment lines (e.g. {@code Knockback II}) for the item's template enchantments, to sit
      * under the Type block. Empty when the item has no enchantments or the vanilla tooltip cannot be
@@ -67,17 +104,7 @@ public final class EnchantDisplay {
             return Collections.emptyList();
         }
 
-        if (enchantments == null || enchantments.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<String> out = new ArrayList<>(enchantments.size());
-
-        for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
-            out.add(ChatColor.GRAY + prettyName(entry.getKey(), languageId) + " " + roman(entry.getValue()));
-        }
-
-        return out;
+        return linesForEnchantments(enchantments, languageId);
     }
 
     /** A human-readable enchantment name: the data-driven translation, else version-safe title-casing of the raw key. */

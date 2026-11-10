@@ -76,7 +76,7 @@ public final class LoreComposer {
      * doubled gaps.
      */
     @Nonnull
-    private static List<String> normalizeBlankLines(@Nonnull List<String> lore) {
+    static List<String> normalizeBlankLines(@Nonnull List<String> lore) {
         List<String> out = new ArrayList<>(lore.size());
 
         for (String line : lore) {

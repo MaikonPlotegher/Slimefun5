@@ -24,6 +24,7 @@ import io.github.thebusybiscuit.slimefun5.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun5.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun5.core.services.localization.EnchantDisplay;
 import io.github.thebusybiscuit.slimefun5.implementation.Slimefun;
 
 
@@ -150,6 +151,10 @@ public class AutoDisenchanter extends AbstractEnchantmentMachine {
                 // Get Enchantment Name
                 Slimefun.logger().log(Level.SEVERE, "AutoDisenchanter has failed to remove enchantment \"{0}\"", KeyedCompat.key(enchantmentToTransfer));
             }
+        }
+
+        if (itemMeta.getEnchants().isEmpty()) {
+            EnchantDisplay.reveal(itemMeta);
         }
 
         item.setItemMeta(itemMeta);
