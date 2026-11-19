@@ -7,11 +7,13 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import io.github.thebusybiscuit.slimefun5.implementation.Slimefun;
 import com.cryptomorin.xseries.XSound;
 
 /**
@@ -132,6 +134,11 @@ public final class SoundCompat {
             return;
         }
 
+        if (Bukkit.getServer() != null && !Bukkit.isPrimaryThread()) {
+            Slimefun.runSync(() -> playAt(loc, soundId, category, volume, pitch));
+            return;
+        }
+
         Sound sound = resolve(soundId);
 
         if (sound == null) {
@@ -159,6 +166,11 @@ public final class SoundCompat {
      */
     public static void playFor(@Nullable Player player, @Nullable Location loc, @Nullable String soundId, @Nullable SoundCategory category, float volume, float pitch) {
         if (player == null || loc == null) {
+            return;
+        }
+
+        if (Bukkit.getServer() != null && !Bukkit.isPrimaryThread()) {
+            Slimefun.runSync(() -> playFor(player, loc, soundId, category, volume, pitch));
             return;
         }
 

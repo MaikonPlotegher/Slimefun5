@@ -7,6 +7,7 @@ import io.github.thebusybiscuit.slimefun5.utils.compatibility.ReflectionCompat;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Particle;
@@ -24,10 +25,8 @@ import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun5.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun5.core.attributes.EnergyNetComponent;
 import io.github.thebusybiscuit.slimefun5.core.networks.energy.EnergyNetComponentType;
-import io.github.thebusybiscuit.slimefun5.implementation.SlimefunItems;
 import io.github.thebusybiscuit.slimefun5.implementation.handlers.SimpleBlockBreakHandler;
-import io.github.thebusybiscuit.slimefun5.utils.SlimefunUtils;
-import io.github.thebusybiscuit.slimefun5.utils.itemstack.ItemStackWrapper;
+import io.github.thebusybiscuit.slimefun5.implementation.items.misc.OrganicFood;
 
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.interfaces.InventoryBlock;
@@ -42,9 +41,6 @@ public class AutoBreeder extends SlimefunItem implements InventoryBlock, EnergyN
     private final int[] border = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
 
     private static final int ENERGY_CONSUMPTION = 60;
-
-    // We wanna strip the Slimefun Item id here
-    private static final ItemStack organicFood = ItemStackWrapper.wrap(SlimefunItems.ORGANIC_FOOD.item());
 
     @ParametersAreNonnullByDefault
     public AutoBreeder(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
@@ -114,14 +110,18 @@ public class AutoBreeder extends SlimefunItem implements InventoryBlock, EnergyN
 
     protected void tick(Block b) {
         BlockMenu inv = BlockStorage.getInventory(b);
+        if (inv == null) {
+            return;
+        }
 
-        for (Entity n : EntityCompat.getNearbyEntities(b.getWorld(), b.getLocation(), 4.0, 2.0, 4.0, this::canBreed)) {
+        if (getCharge(b.getLocation()) < ENERGY_CONSUMPTION) {
+            return;
+        }
+
+        Location center = b.getLocation().add(0.5, 0.5, 0.5);
+        for (Entity n : EntityCompat.getNearbyEntities(b.getWorld(), center, 4.0, 2.0, 4.0, this::canBreed)) {
             for (int slot : getInputSlots()) {
-                if (SlimefunUtils.isItemSimilar(inv.getItemInSlot(slot), organicFood, false)) {
-                    if (getCharge(b.getLocation()) < ENERGY_CONSUMPTION) {
-                        return;
-                    }
-
+                if (OrganicFood.isOrganicFood(inv.getItemInSlot(slot))) {
                     removeCharge(b.getLocation(), ENERGY_CONSUMPTION);
                     inv.consumeItem(slot);
 

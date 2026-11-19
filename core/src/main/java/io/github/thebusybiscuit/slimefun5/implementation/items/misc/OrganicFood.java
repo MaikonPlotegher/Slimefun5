@@ -1,5 +1,6 @@
 package io.github.thebusybiscuit.slimefun5.implementation.items.misc;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.bukkit.Material;
@@ -12,6 +13,7 @@ import io.github.thebusybiscuit.slimefun5.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun5.implementation.SlimefunItems;
 import io.github.thebusybiscuit.slimefun5.implementation.items.electric.machines.FoodFabricator;
 import io.github.thebusybiscuit.slimefun5.implementation.items.electric.machines.accelerators.AnimalGrowthAccelerator;
+import io.github.thebusybiscuit.slimefun5.utils.SlimefunUtils;
 
 /**
  * {@link OrganicFood} is created using a {@link FoodFabricator} and can
@@ -31,6 +33,23 @@ public class OrganicFood extends SlimefunItem {
         // Java-8 universal port: the ingredient may not exist on a legacy server (null); substitute a
         // placeholder so the item still registers instead of crashing in new ItemStack(null).
         super(itemGroup, item, RecipeType.FOOD_FABRICATOR, new ItemStack[] { SlimefunItems.TIN_CAN.item(), new ItemStack(ingredient != null ? ingredient : Material.PAPER), null, null, null, null, null, null, null }, new SlimefunItemStack(item, OUTPUT).item());
+    }
+
+    public static boolean isOrganicFood(@Nullable ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) {
+            return false;
+        }
+
+        SlimefunItem sfItem = SlimefunItem.getByItem(item);
+        if (sfItem instanceof OrganicFood) {
+            return true;
+        }
+
+        if (sfItem != null && sfItem.getId().startsWith("ORGANIC_FOOD")) {
+            return true;
+        }
+
+        return SlimefunUtils.isItemSimilar(item, SlimefunItems.ORGANIC_FOOD.item(), false, false);
     }
 }
 

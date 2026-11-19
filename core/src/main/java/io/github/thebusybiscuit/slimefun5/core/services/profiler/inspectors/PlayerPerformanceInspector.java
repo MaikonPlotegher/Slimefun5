@@ -33,6 +33,8 @@ public class PlayerPerformanceInspector implements PerformanceInspector {
      */
     private final SummaryOrderType orderType;
 
+    private final boolean verbose;
+
     /**
      * This creates a new {@link PlayerPerformanceInspector} for the given {@link Player}.
      * 
@@ -42,11 +44,16 @@ public class PlayerPerformanceInspector implements PerformanceInspector {
      *            The {@link SummaryOrderType} of the timings
      */
     public PlayerPerformanceInspector(@Nonnull Player player, @Nonnull SummaryOrderType orderType) {
+        this(player, orderType, false);
+    }
+
+    public PlayerPerformanceInspector(@Nonnull Player player, @Nonnull SummaryOrderType orderType, boolean verbose) {
         Validate.notNull(player, "Player cannot be null");
         Validate.notNull(orderType, "SummaryOrderType cannot be null");
 
         this.uuid = player.getUniqueId();
         this.orderType = orderType;
+        this.verbose = verbose;
     }
 
     /**
@@ -70,7 +77,7 @@ public class PlayerPerformanceInspector implements PerformanceInspector {
      */
     @Override
     public boolean isVerbose() {
-        return false;
+        return verbose;
     }
 
     /**

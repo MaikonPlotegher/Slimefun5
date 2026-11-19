@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -138,7 +139,17 @@ public class BackpackListener implements Listener {
     @ParametersAreNonnullByDefault
     public void openBackpack(Player p, ItemStack item, SlimefunBackpack backpack) {
         if (item.getAmount() == 1) {
-            if (backpack.canUse(p, true) && !PlayerProfile.get(p, profile -> openBackpack(p, item, profile, backpack.getSize()))) {
+            if (backpack.canUse(p, true) && !PlayerProfile.get(p, profile -> {
+                if (Bukkit.getServer() != null && !Bukkit.isPrimaryThread()) {
+                    Slimefun.runSync(() -> {
+                        if (p.isOnline()) {
+                            openBackpack(p, item, profile, backpack.getSize());
+                        }
+                    });
+                } else {
+                    openBackpack(p, item, profile, backpack.getSize());
+                }
+            })) {
                 Slimefun.getLocalization().sendMessage(p, "messages.opening-backpack");
             }
         } else {
@@ -172,9 +183,19 @@ public class BackpackListener implements Listener {
                 // On failure the callback never fires (PlayerProfile#getBackpack logs why) - no sound, no
                 // stuck "being viewed" entry.
                 if (backpack != null) {
-                    SoundEffect.BACKPACK_OPEN_SOUND.playAt(p.getLocation(), SoundCategory.PLAYERS);
-                    backpacks.put(p.getUniqueId(), item);
-                    backpack.open(p);
+                    Runnable openAction = () -> {
+                        if (p.isOnline()) {
+                            SoundEffect.BACKPACK_OPEN_SOUND.playAt(p.getLocation(), SoundCategory.PLAYERS);
+                            backpacks.put(p.getUniqueId(), item);
+                            backpack.open(p);
+                        }
+                    };
+
+                    if (Bukkit.getServer() != null && !Bukkit.isPrimaryThread()) {
+                        Slimefun.runSync(openAction);
+                    } else {
+                        openAction.run();
+                    }
                 }
             });
         } else {

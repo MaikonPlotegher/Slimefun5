@@ -9,19 +9,14 @@ import org.bukkit.inventory.ItemStack;
 import io.github.thebusybiscuit.slimefun5.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun5.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun5.implementation.SlimefunItems;
-import io.github.thebusybiscuit.slimefun5.utils.SlimefunUtils;
+import io.github.thebusybiscuit.slimefun5.implementation.items.misc.OrganicFertilizer;
 import io.github.thebusybiscuit.slimefun5.utils.compatibility.VersionedParticle;
-import io.github.thebusybiscuit.slimefun5.utils.itemstack.ItemStackWrapper;
 import io.github.thebusybiscuit.slimefun5.utils.tags.SlimefunTag;
 
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 public abstract class CropGrowthAccelerator extends AbstractGrowthAccelerator {
-
-    // We wanna strip the Slimefun Item id here
-    private static final ItemStack organicFertilizer = ItemStackWrapper.wrap(SlimefunItems.FERTILIZER.item());
 
     protected CropGrowthAccelerator(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
@@ -60,7 +55,7 @@ public abstract class CropGrowthAccelerator extends AbstractGrowthAccelerator {
 
         if (BlockDataCompat.getInt(ageable, "getAge") < BlockDataCompat.getInt(ageable, "getMaximumAge")) {
             for (int slot : getInputSlots()) {
-                if (SlimefunUtils.isItemSimilar(inv.getItemInSlot(slot), organicFertilizer, false, false)) {
+                if (OrganicFertilizer.isOrganicFertilizer(inv.getItemInSlot(slot))) {
                     removeCharge(machine.getLocation(), getEnergyConsumption());
                     inv.consumeItem(slot);
 

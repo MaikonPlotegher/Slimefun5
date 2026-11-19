@@ -48,11 +48,6 @@ class TimingsCommand extends SubCommand {
 
         boolean verbose = hasFlag(args, "verbose");
 
-        if (verbose && sender instanceof Player) {
-            Slimefun.getLocalization().sendMessage(sender, "commands.timings.verbose-player", true);
-            return;
-        }
-
         SummaryOrderType orderType = SummaryOrderType.HIGHEST;
 
         if (hasFlag(args, "avg")) {
@@ -100,7 +95,8 @@ class TimingsCommand extends SubCommand {
     @ParametersAreNonnullByDefault
     private PerformanceInspector inspectorOf(CommandSender sender, boolean verbose, SummaryOrderType orderType) {
         if (sender instanceof Player) {
-            Player player = (Player) sender;            return new PlayerPerformanceInspector(player, orderType);
+            Player player = (Player) sender;
+            return new PlayerPerformanceInspector(player, orderType, verbose);
         } else {
             return new ConsolePerformanceInspector(sender, verbose, orderType);
         }

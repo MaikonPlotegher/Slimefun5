@@ -3,6 +3,7 @@ package io.github.thebusybiscuit.slimefun5.implementation.tasks.armor;
 import io.github.thebusybiscuit.slimefun5.utils.compatibility.MaterialCompat;
 
 import io.github.bakedlibs.dough.common.ChatColors;
+import io.github.thebusybiscuit.slimefun5.api.events.PlayerRadiationExposureEvent;
 import io.github.thebusybiscuit.slimefun5.api.events.RadiationDamageEvent;
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun5.api.player.PlayerProfile;
@@ -59,17 +60,38 @@ public class RadiationTask extends AbstractArmorTask {
                 }
                 SlimefunItem sfItem = SlimefunItem.getByItem(item);
                 if (sfItem instanceof Radioactive) {
-                    Radioactive radioactiveItem = (Radioactive) sfItem;                    exposureTotal += item.getAmount() * radioactiveItem.getRadioactivity().getExposureModifier();
+                    Radioactive radioactiveItem = (Radioactive) sfItem;
+                    exposureTotal += item.getAmount() * radioactiveItem.getRadioactivity().getExposureModifier();
                 }
             }
+
             int exposureLevelBefore = RadiationUtils.getExposure(p);
+            int maxAllowedExposure = 100;
 
             if (exposureTotal > 0) {
-                if (exposureLevelBefore == 0) {
-                    Slimefun.getLocalization().sendMessage(p, "messages.radiation");
-                }
+                PlayerRadiationExposureEvent event = new PlayerRadiationExposureEvent(p, exposureTotal, exposureLevelBefore, p.getInventory().getArmorContents());
+                Bukkit.getPluginManager().callEvent(event);
 
-                RadiationUtils.addExposure(p, exposureTotal);
+
+                if (event.isCancelled() || event.getExposure() <= 0 || event.getMaxExposure() <= 0) {
+                    exposureTotal = 0;
+                    maxAllowedExposure = 0;
+                } else {
+                    exposureTotal = event.getExposure();
+                    maxAllowedExposure = event.getMaxExposure();
+                }
+            }
+
+            if (exposureTotal > 0) {
+                if (exposureLevelBefore < maxAllowedExposure) {
+                    if (exposureLevelBefore == 0) {
+                        Slimefun.getLocalization().sendMessage(p, "messages.radiation");
+                    }
+                    int toAdd = Math.min(exposureTotal, maxAllowedExposure - exposureLevelBefore);
+                    RadiationUtils.addExposure(p, toAdd);
+                } else if (exposureLevelBefore > maxAllowedExposure) {
+                    RadiationUtils.removeExposure(p, 1);
+                }
             } else if (exposureLevelBefore > 0) {
                 RadiationUtils.removeExposure(p, 1);
             }

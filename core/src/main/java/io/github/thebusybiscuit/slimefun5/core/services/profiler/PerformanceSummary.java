@@ -24,7 +24,7 @@ class PerformanceSummary {
     // The threshold at which a Block or Chunk is significant enough to appear in /sf timings
     private static final int VISIBILITY_THRESHOLD = 260_000;
     private static final int MIN_ITEMS = 6;
-    private static final int MAX_ITEMS = 20;
+    private static final int MAX_ITEMS = 35;
 
     private final SlimefunProfiler profiler;
     private final PerformanceRating rating;
@@ -60,14 +60,16 @@ class PerformanceSummary {
 
         summarizeTimings(totalTickedBlocks, Slimefun.getLocalization().getMessage("commands.timings.category.block"), sender, items, entry -> {
             int count = profiler.getBlocksOfId(entry.getKey());
-            String time = NumberUtils.getAsMillis(entry.getValue());
+            long totalNanos = items.getOrDefault(entry.getKey(), entry.getValue());
+            long avgNanos = count > 0 ? totalNanos / count : totalNanos;
+            String time = NumberUtils.getAsMillis(totalNanos);
             String message = entry.getKey() +  " - " + count + "x (%s)";
 
             if (count <= 1) {
                 return String.format(message, time);
             }
 
-            String average = NumberUtils.getAsMillis(entry.getValue() / count);
+            String average = NumberUtils.getAsMillis(avgNanos);
 
             if (sender.getOrderType() == SummaryOrderType.AVERAGE) {
                 return String.format(message, average + Slimefun.getLocalization().getMessage("commands.timings.pipe-total") + time);
@@ -78,14 +80,16 @@ class PerformanceSummary {
 
         summarizeTimings(chunks.size(), Slimefun.getLocalization().getMessage("commands.timings.category.chunk"), sender, chunks, entry -> {
             int count = profiler.getBlocksInChunk(entry.getKey());
-            String time = NumberUtils.getAsMillis(entry.getValue());
+            long totalNanos = chunks.getOrDefault(entry.getKey(), entry.getValue());
+            String time = NumberUtils.getAsMillis(totalNanos);
 
             return entry.getKey() + " - " + count + " block" + (count != 1 ? 's' : "") + " (" + time + ")";
         });
 
         summarizeTimings(plugins.size(), Slimefun.getLocalization().getMessage("commands.timings.category.plugin"), sender, plugins, entry -> {
             int count = profiler.getBlocksFromPlugin(entry.getKey());
-            String time = NumberUtils.getAsMillis(entry.getValue());
+            long totalNanos = plugins.getOrDefault(entry.getKey(), entry.getValue());
+            String time = NumberUtils.getAsMillis(totalNanos);
 
             return entry.getKey() + " - " + count + " block" + (count != 1 ? 's' : "") + " (" + time + ")";
         });
@@ -97,8 +101,9 @@ class PerformanceSummary {
         List<Entry<String, Long>> results = inspector.getOrderType().sort(profiler, entrySet);
         String prefix = count + " " + name + (count != 1 ? 's' : "");
 
-        if (inspector instanceof PlayerPerformanceInspector) {
-            PlayerPerformanceInspector playerPerformanceInspector = (PlayerPerformanceInspector) inspector;            TextComponent component = summarizeAsTextComponent(count, prefix, results, formatter);
+        if (inspector instanceof PlayerPerformanceInspector && !inspector.isVerbose()) {
+            PlayerPerformanceInspector playerPerformanceInspector = (PlayerPerformanceInspector) inspector;
+            TextComponent component = summarizeAsTextComponent(count, prefix, results, formatter);
             playerPerformanceInspector.sendMessage(component);
         } else {
             String text = summarizeAsString(inspector, count, prefix, results, formatter);

@@ -446,7 +446,7 @@ public final class SlimefunUtils {
                 Debug.log(TestCase.CARGO_INPUT_TESTING, "  Comparing meta (vanilla items?) - {} == {} (lore: {})", itemMeta, sfItemMeta, checkLore);
                 return equalsItemMeta(itemMeta, sfItemMeta, checkLore);
             } else {
-                return false;
+                return !itemMeta.hasDisplayName() && !itemMeta.hasLore() && !ItemMetaCompat.hasCustomModelData(itemMeta);
             }
         } else {
             return !sfitem.hasItemMeta();

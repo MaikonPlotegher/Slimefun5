@@ -1142,7 +1142,7 @@ public class ItemTranslationService {
         String contributedName = contributed.getName();
 
         if (contributedName != null) {
-            return new RenderedDisplay(styledName(item, ChatColor.translateAlternateColorCodes('&', contributedName)), lore);
+            return new RenderedDisplay(ChatColor.translateAlternateColorCodes('&', contributedName), lore);
         }
 
         String authoredName = getNameForLanguage(effectiveLanguage, id);

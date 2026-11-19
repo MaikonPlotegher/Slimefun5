@@ -3,6 +3,7 @@ package io.github.thebusybiscuit.slimefun5.implementation.items.electric.machine
 import io.github.thebusybiscuit.slimefun5.utils.compatibility.EntityCompat;
 import io.github.thebusybiscuit.slimefun5.utils.compatibility.ParticleCompat;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Entity;
@@ -12,10 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import io.github.thebusybiscuit.slimefun5.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun5.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun5.implementation.SlimefunItems;
-import io.github.thebusybiscuit.slimefun5.utils.SlimefunUtils;
+import io.github.thebusybiscuit.slimefun5.implementation.items.misc.OrganicFood;
 import io.github.thebusybiscuit.slimefun5.utils.compatibility.VersionedParticle;
-import io.github.thebusybiscuit.slimefun5.utils.itemstack.ItemStackWrapper;
 
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
@@ -24,9 +23,6 @@ public class AnimalGrowthAccelerator extends AbstractGrowthAccelerator {
 
     private static final int ENERGY_CONSUMPTION = 14;
     private static final double RADIUS = 3.0;
-
-    // We wanna strip the Slimefun Item id here
-    private static final ItemStack organicFood = ItemStackWrapper.wrap(SlimefunItems.ORGANIC_FOOD.item());
 
     public AnimalGrowthAccelerator(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
@@ -40,14 +36,18 @@ public class AnimalGrowthAccelerator extends AbstractGrowthAccelerator {
     @Override
     protected void tick(Block b) {
         BlockMenu inv = BlockStorage.getInventory(b);
+        if (inv == null) {
+            return;
+        }
 
-        for (Entity n : EntityCompat.getNearbyEntities(b.getWorld(), b.getLocation(), RADIUS, RADIUS, RADIUS, this::isReadyToGrow)) {
+        if (getCharge(b.getLocation()) < ENERGY_CONSUMPTION) {
+            return;
+        }
+
+        Location center = b.getLocation().add(0.5, 0.5, 0.5);
+        for (Entity n : EntityCompat.getNearbyEntities(b.getWorld(), center, RADIUS, RADIUS, RADIUS, this::isReadyToGrow)) {
             for (int slot : getInputSlots()) {
-                if (SlimefunUtils.isItemSimilar(inv.getItemInSlot(slot), organicFood, false, false)) {
-                    if (getCharge(b.getLocation()) < ENERGY_CONSUMPTION) {
-                        return;
-                    }
-
+                if (OrganicFood.isOrganicFood(inv.getItemInSlot(slot))) {
                     Ageable ageable = (Ageable) n;
                     removeCharge(b.getLocation(), ENERGY_CONSUMPTION);
                     inv.consumeItem(slot);
@@ -65,7 +65,8 @@ public class AnimalGrowthAccelerator extends AbstractGrowthAccelerator {
     }
 
     private boolean isReadyToGrow(Entity n) {
-        return n instanceof Ageable && n.isValid() && !((Ageable) n).isAdult();    }
+        return n instanceof Ageable && n.isValid() && !((Ageable) n).isAdult() && !((Ageable) n).getAgeLock();
+    }
 
 }
 

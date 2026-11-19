@@ -17,11 +17,8 @@ import io.github.thebusybiscuit.slimefun5.api.MinecraftVersion;
 import io.github.thebusybiscuit.slimefun5.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun5.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun5.api.recipes.RecipeType;
-import io.github.thebusybiscuit.slimefun5.implementation.Slimefun;
-import io.github.thebusybiscuit.slimefun5.implementation.SlimefunItems;
-import io.github.thebusybiscuit.slimefun5.utils.SlimefunUtils;
+import io.github.thebusybiscuit.slimefun5.implementation.items.misc.OrganicFertilizer;
 import io.github.thebusybiscuit.slimefun5.utils.compatibility.VersionedParticle;
-import io.github.thebusybiscuit.slimefun5.utils.itemstack.ItemStackWrapper;
 
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
@@ -40,9 +37,6 @@ public class TreeGrowthAccelerator extends AbstractGrowthAccelerator {
 
     private static final int ENERGY_CONSUMPTION = 24;
     private static final int RADIUS = 9;
-
-    // We wanna strip the Slimefun Item id here
-    private static final ItemStack organicFertilizer = ItemStackWrapper.wrap(SlimefunItems.FERTILIZER.item());
 
     @ParametersAreNonnullByDefault
     public TreeGrowthAccelerator(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
@@ -99,7 +93,7 @@ public class TreeGrowthAccelerator extends AbstractGrowthAccelerator {
     }
 
     protected boolean isFertilizer(@Nullable ItemStack item) {
-        return SlimefunUtils.isItemSimilar(item, organicFertilizer, false, false);
+        return OrganicFertilizer.isOrganicFertilizer(item);
     }
 
 }
